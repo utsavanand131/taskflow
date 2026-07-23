@@ -1,5 +1,6 @@
 import type { GraphQLContext } from "../context";
 import { registerUser, loginUser } from "@/services/auth";
+import { requireAuth } from "@/lib/require-auth";
 
 interface RegisterArgs {
   name: string;
@@ -13,6 +14,12 @@ interface LoginArgs {
 }
 
 export const userResolvers = {
+  Query: {
+    me: (_parent: unknown, _args: unknown, context: GraphQLContext) => {
+      return requireAuth(context);
+    },
+  },
+
   Mutation: {
     register: async (
       _parent: unknown,

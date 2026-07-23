@@ -10,6 +10,10 @@ const baseTypeDefs = gql`
   type Query {
     health: String!
   }
+
+  type Mutation {
+    _empty: String
+  }
 `;
 
 export const typeDefs = [
