@@ -1,15 +1,20 @@
 import type { GraphQLContext } from "../context";
+import { registerUser } from "@/services/auth";
+
+interface RegisterArgs {
+  name: string;
+  email: string;
+  password: string;
+}
 
 export const userResolvers = {
   Mutation: {
     register: async (
       _parent: unknown,
-      _args: unknown,
+      args: RegisterArgs,
       context: GraphQLContext,
     ) => {
-      console.log("Prisma available:", !!context.prisma);
-
-      throw new Error("Not implemented yet");
+      return registerUser(context.prisma, args);
     },
   },
 };
