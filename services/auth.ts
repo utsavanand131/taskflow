@@ -1,6 +1,6 @@
 import type { PrismaClient } from "@/app/generated/prisma/client";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import { generateToken } from "@/lib/jwt";
 import { registerSchema, loginSchema } from "@/validations/user";
 
 export interface RegisterUserInput {
@@ -17,24 +17,6 @@ export interface LoginUserInput {
 async function hashPassword(password: string) {
   const SALT_ROUNDS = 10;
   return bcrypt.hash(password, SALT_ROUNDS);
-}
-
-function generateToken(userId: string) {
-  const secret = process.env.JWT_SECRET;
-
-  if (!secret) {
-    throw new Error("JWT_SECRET is not configured.");
-  }
-
-  return jwt.sign(
-    {
-      userId,
-    },
-    secret,
-    {
-      expiresIn: "7d",
-    },
-  );
 }
 
 export async function registerUser(
