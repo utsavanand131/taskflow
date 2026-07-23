@@ -1,10 +1,15 @@
 import type { PrismaClient } from "@/app/generated/prisma/client";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { registerSchema } from "@/validations/user";
+import { registerSchema, loginSchema } from "@/validations/user";
 
 export interface RegisterUserInput {
   name: string;
+  email: string;
+  password: string;
+}
+
+export interface LoginUserInput {
   email: string;
   password: string;
 }
@@ -36,7 +41,6 @@ export async function registerUser(
   prisma: PrismaClient,
   input: RegisterUserInput,
 ) {
-  // Validate input
   const result = registerSchema.safeParse(input);
 
   if (!result.success) {
@@ -45,7 +49,6 @@ export async function registerUser(
 
   const validatedData = result.data;
 
-  // Check if user already exists
   const existingUser = await prisma.user.findUnique({
     where: {
       email: validatedData.email,
@@ -56,12 +59,8 @@ export async function registerUser(
     throw new Error("A user with this email already exists.");
   }
 
-  // Hash password
   const hashedPassword = await hashPassword(validatedData.password);
 
-  console.log("Password hashed successfully.");
-
-  // Create user
   const user = await prisma.user.create({
     data: {
       name: validatedData.name,
@@ -70,9 +69,48 @@ export async function registerUser(
     },
   });
 
-  console.log("User created:", user.id);
+  const token = generateToken(user.id);
 
-  // Generate JWT
+  return {
+    token,
+    user,
+  };
+}
+
+export async function loginUser(prisma: PrismaClient, input: LoginUserInput) {
+  const result = loginSchema.safeParse(input);
+
+  if (!result.success) {
+    throw new Error(result.error.issues[0].message);
+  }
+
+  const validatedData = result.data;
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email: validatedData.email,
+    },
+  });
+
+  if (!user) {
+    throw new Error("Invalid email or password.");
+  }
+
+  if (!user.password) {
+    throw new Error(
+      "This account does not have a password. Please sign in using your OAuth provider.",
+    );
+  }
+
+  const isPasswordValid = await bcrypt.compare(
+    validatedData.password,
+    user.password,
+  );
+
+  if (!isPasswordValid) {
+    throw new Error("Invalid email or password.");
+  }
+
   const token = generateToken(user.id);
 
   return {
