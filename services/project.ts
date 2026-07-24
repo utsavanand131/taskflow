@@ -37,3 +37,19 @@ export async function getProjects(prisma: PrismaClient, ownerId: string) {
     },
   });
 }
+
+export async function getProjectById(
+  prisma: PrismaClient,
+  ownerId: string,
+  projectId: string,
+) {
+  return prisma.project.findFirst({
+    where: {
+      id: projectId,
+      ownerId,
+    },
+    include: {
+      owner: true,
+    },
+  });
+}
