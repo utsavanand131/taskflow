@@ -89,3 +89,28 @@ export async function updateProject(
     },
   });
 }
+
+export async function deleteProject(
+  prisma: PrismaClient,
+  ownerId: string,
+  projectId: string,
+) {
+  const project = await prisma.project.findFirst({
+    where: {
+      id: projectId,
+      ownerId,
+    },
+  });
+
+  if (!project) {
+    return false;
+  }
+
+  await prisma.project.delete({
+    where: {
+      id: projectId,
+    },
+  });
+
+  return true;
+}

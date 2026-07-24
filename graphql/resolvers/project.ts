@@ -3,6 +3,7 @@ import type { GraphQLContext } from "../context";
 import { requireAuth } from "@/lib/require-auth";
 import {
   createProject,
+  deleteProject,
   getProjectById,
   getProjects,
   updateProject,
@@ -88,6 +89,22 @@ export const projectResolvers = {
       }
 
       return project;
+    },
+
+    deleteProject: async (
+      _parent: unknown,
+      args: ProjectArgs,
+      context: GraphQLContext,
+    ) => {
+      const user = requireAuth(context);
+
+      const deleted = await deleteProject(context.prisma, user.id, args.id);
+
+      if (!deleted) {
+        throw new Error("Project not found.");
+      }
+
+      return true;
     },
   },
 };

@@ -32,5 +32,7 @@ export const projectTypeDefs = gql`
     createProject(input: CreateProjectInput!): Project!
 
     updateProject(id: ID!, input: UpdateProjectInput!): Project!
+
+    deleteProject(id: ID!): Boolean!
   }
 `;
