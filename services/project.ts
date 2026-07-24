@@ -23,3 +23,17 @@ export async function createProject(
     },
   });
 }
+
+export async function getProjects(prisma: PrismaClient, ownerId: string) {
+  return prisma.project.findMany({
+    where: {
+      ownerId,
+    },
+    include: {
+      owner: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+}

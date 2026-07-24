@@ -1,7 +1,7 @@
 import type { GraphQLContext } from "../context";
 
 import { requireAuth } from "@/lib/require-auth";
-import { createProject } from "@/services/project";
+import { createProject, getProjects } from "@/services/project";
 
 interface CreateProjectArgs {
   input: {
@@ -11,8 +11,31 @@ interface CreateProjectArgs {
   };
 }
 
+interface ProjectArgs {
+  id: string;
+}
+
 export const projectResolvers = {
-  Query: {},
+  Query: {
+    projects: async (
+      _parent: unknown,
+      _args: unknown,
+      context: GraphQLContext,
+    ) => {
+      const user = requireAuth(context);
+
+      return getProjects(context.prisma, user.id);
+    },
+
+    project: async (
+      _parent: unknown,
+      args: ProjectArgs,
+      context: GraphQLContext,
+    ) => {
+      // We'll implement this in the next milestone.
+      return null;
+    },
+  },
 
   Mutation: {
     createProject: async (
