@@ -6,6 +6,12 @@ interface CreateProjectInput {
   color?: string;
 }
 
+interface UpdateProjectInput {
+  name?: string;
+  description?: string;
+  color?: string;
+}
+
 export async function createProject(
   prisma: PrismaClient,
   ownerId: string,
@@ -47,6 +53,36 @@ export async function getProjectById(
     where: {
       id: projectId,
       ownerId,
+    },
+    include: {
+      owner: true,
+    },
+  });
+}
+
+export async function updateProject(
+  prisma: PrismaClient,
+  ownerId: string,
+  projectId: string,
+  input: UpdateProjectInput,
+) {
+  const project = await prisma.project.findFirst({
+    where: {
+      id: projectId,
+      ownerId,
+    },
+  });
+
+  if (!project) {
+    return null;
+  }
+
+  return prisma.project.update({
+    where: {
+      id: projectId,
+    },
+    data: {
+      ...input,
     },
     include: {
       owner: true,

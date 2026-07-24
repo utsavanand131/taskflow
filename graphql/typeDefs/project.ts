@@ -17,6 +17,12 @@ export const projectTypeDefs = gql`
     color: String
   }
 
+  input UpdateProjectInput {
+    name: String
+    description: String
+    color: String
+  }
+
   extend type Query {
     projects: [Project!]!
     project(id: ID!): Project
@@ -24,5 +30,7 @@ export const projectTypeDefs = gql`
 
   extend type Mutation {
     createProject(input: CreateProjectInput!): Project!
+
+    updateProject(id: ID!, input: UpdateProjectInput!): Project!
   }
 `;

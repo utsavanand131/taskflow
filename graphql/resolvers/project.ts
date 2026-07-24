@@ -1,11 +1,25 @@
 import type { GraphQLContext } from "../context";
 
 import { requireAuth } from "@/lib/require-auth";
-import { createProject, getProjectById, getProjects } from "@/services/project";
+import {
+  createProject,
+  getProjectById,
+  getProjects,
+  updateProject,
+} from "@/services/project";
 
 interface CreateProjectArgs {
   input: {
     name: string;
+    description?: string;
+    color?: string;
+  };
+}
+
+interface UpdateProjectArgs {
+  id: string;
+  input: {
+    name?: string;
     description?: string;
     color?: string;
   };
@@ -53,6 +67,27 @@ export const projectResolvers = {
       const user = requireAuth(context);
 
       return createProject(context.prisma, user.id, args.input);
+    },
+
+    updateProject: async (
+      _parent: unknown,
+      args: UpdateProjectArgs,
+      context: GraphQLContext,
+    ) => {
+      const user = requireAuth(context);
+
+      const project = await updateProject(
+        context.prisma,
+        user.id,
+        args.id,
+        args.input,
+      );
+
+      if (!project) {
+        throw new Error("Project not found.");
+      }
+
+      return project;
     },
   },
 };
