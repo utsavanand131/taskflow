@@ -26,6 +26,12 @@ enum TeamRole {
   MEMBER
 }
 
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
 model User {
   id            String  @id @default(cuid())
   name          String
@@ -37,8 +43,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  projects        Project[]
-  teamMemberships TeamMember[]
+  projects         Project[]
+  teamMemberships  TeamMember[]
+  sentInvitations  TeamInvitation[] @relation("InvitedBy")
 }
 
 model Project {
@@ -87,7 +94,8 @@ model Team {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  members TeamMember[]
+  members      TeamMember[]
+  invitations  TeamInvitation[]
 }
 
 model TeamMember {
@@ -104,4 +112,25 @@ model TeamMember {
   @@unique([teamId, userId])
   @@index([teamId])
   @@index([userId])
+}
+
+model TeamInvitation {
+  id String @id @default(cuid())
+
+  email String
+
+  status InvitationStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invitedById String
+  teamId String
+
+  invitedBy User @relation("InvitedBy", fields: [invitedById], references: [id], onDelete: Cascade)
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@index([teamId])
+  @@index([email])
 }
