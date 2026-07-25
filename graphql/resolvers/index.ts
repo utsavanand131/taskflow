@@ -1,6 +1,7 @@
 import { userResolvers } from "./user";
 import { projectResolvers } from "./project";
 import { taskResolvers } from "./task";
+import { teamResolvers } from "./team";
 
 export const resolvers = {
   Query: {
@@ -8,11 +9,13 @@ export const resolvers = {
     ...userResolvers.Query,
     ...projectResolvers.Query,
     ...taskResolvers.Query,
+    ...teamResolvers.Query,
   },
 
   Mutation: {
     ...userResolvers.Mutation,
     ...projectResolvers.Mutation,
     ...taskResolvers.Mutation,
+    ...teamResolvers.Mutation,
   },
 };

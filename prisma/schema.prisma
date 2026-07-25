@@ -20,6 +20,12 @@ enum TaskPriority {
   URGENT
 }
 
+enum TeamRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
 model User {
   id            String  @id @default(cuid())
   name          String
@@ -31,7 +37,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  projects Project[]
+  projects        Project[]
+  teamMemberships TeamMember[]
 }
 
 model Project {
@@ -70,4 +77,31 @@ model Task {
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([projectId])
+}
+
+model Team {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members TeamMember[]
+}
+
+model TeamMember {
+  id String @id @default(cuid())
+
+  role TeamRole @default(MEMBER)
+
+  teamId String
+  userId String
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+  @@index([teamId])
+  @@index([userId])
 }
