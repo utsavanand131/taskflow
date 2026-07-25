@@ -3,6 +3,7 @@ import { projectResolvers } from "./project";
 import { taskResolvers } from "./task";
 import { teamResolvers } from "./team";
 import { invitationResolvers } from "./invitation";
+import { teamMemberResolvers } from "./team-member";
 
 export const resolvers = {
   Query: {
@@ -12,6 +13,7 @@ export const resolvers = {
     ...taskResolvers.Query,
     ...teamResolvers.Query,
     ...invitationResolvers.Query,
+    ...teamMemberResolvers.Query,
   },
 
   Mutation: {
@@ -20,5 +22,6 @@ export const resolvers = {
     ...taskResolvers.Mutation,
     ...teamResolvers.Mutation,
     ...invitationResolvers.Mutation,
+    ...teamMemberResolvers.Mutation,
   },
 };

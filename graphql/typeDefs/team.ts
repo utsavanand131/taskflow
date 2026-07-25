@@ -36,14 +36,28 @@ export const teamTypeDefs = gql`
     description: String
   }
 
+  input UpdateTeamMemberRoleInput {
+    teamId: ID!
+    userId: ID!
+    role: TeamRole!
+  }
+
   extend type Query {
     teams: [Team!]!
     team(id: ID!): Team
+
+    teamMembers(teamId: ID!): [TeamMember!]!
   }
 
   extend type Mutation {
     createTeam(input: CreateTeamInput!): Team!
+
     updateTeam(id: ID!, input: UpdateTeamInput!): Team!
+
     deleteTeam(id: ID!): Boolean!
+
+    removeTeamMember(teamId: ID!, userId: ID!): Boolean!
+
+    updateTeamMemberRole(input: UpdateTeamMemberRoleInput!): TeamMember!
   }
 `;
