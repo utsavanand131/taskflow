@@ -4,6 +4,7 @@ interface CreateProjectInput {
   name: string;
   description?: string;
   color?: string;
+  teamId?: string;
 }
 
 interface UpdateProjectInput {
@@ -17,15 +18,30 @@ export async function createProject(
   ownerId: string,
   input: CreateProjectInput,
 ) {
+  if (input.teamId) {
+    const membership = await prisma.teamMember.findFirst({
+      where: {
+        teamId: input.teamId,
+        userId: ownerId,
+      },
+    });
+
+    if (!membership) {
+      throw new Error("You are not a member of this team.");
+    }
+  }
+
   return prisma.project.create({
     data: {
       name: input.name,
       description: input.description,
       color: input.color,
       ownerId,
+      teamId: input.teamId,
     },
     include: {
       owner: true,
+      team: true,
     },
   });
 }
@@ -33,10 +49,24 @@ export async function createProject(
 export async function getProjects(prisma: PrismaClient, ownerId: string) {
   return prisma.project.findMany({
     where: {
-      ownerId,
+      OR: [
+        {
+          ownerId,
+        },
+        {
+          team: {
+            members: {
+              some: {
+                userId: ownerId,
+              },
+            },
+          },
+        },
+      ],
     },
     include: {
       owner: true,
+      team: true,
     },
     orderBy: {
       createdAt: "desc",
@@ -52,10 +82,24 @@ export async function getProjectById(
   return prisma.project.findFirst({
     where: {
       id: projectId,
-      ownerId,
+      OR: [
+        {
+          ownerId,
+        },
+        {
+          team: {
+            members: {
+              some: {
+                userId: ownerId,
+              },
+            },
+          },
+        },
+      ],
     },
     include: {
       owner: true,
+      team: true,
     },
   });
 }
@@ -69,7 +113,20 @@ export async function updateProject(
   const project = await prisma.project.findFirst({
     where: {
       id: projectId,
-      ownerId,
+      OR: [
+        {
+          ownerId,
+        },
+        {
+          team: {
+            members: {
+              some: {
+                userId: ownerId,
+              },
+            },
+          },
+        },
+      ],
     },
   });
 
@@ -86,6 +143,7 @@ export async function updateProject(
     },
     include: {
       owner: true,
+      team: true,
     },
   });
 }
@@ -98,7 +156,20 @@ export async function deleteProject(
   const project = await prisma.project.findFirst({
     where: {
       id: projectId,
-      ownerId,
+      OR: [
+        {
+          ownerId,
+        },
+        {
+          team: {
+            members: {
+              some: {
+                userId: ownerId,
+              },
+            },
+          },
+        },
+      ],
     },
   });
 

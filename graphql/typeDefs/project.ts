@@ -7,6 +7,7 @@ export const projectTypeDefs = gql`
     description: String
     color: String
     owner: User!
+    team: Team
     createdAt: String!
     updatedAt: String!
   }
@@ -15,6 +16,7 @@ export const projectTypeDefs = gql`
     name: String!
     description: String
     color: String
+    teamId: ID
   }
 
   input UpdateProjectInput {

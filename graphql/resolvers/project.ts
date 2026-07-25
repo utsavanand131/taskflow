@@ -14,6 +14,7 @@ interface CreateProjectArgs {
     name: string;
     description?: string;
     color?: string;
+    teamId?: string;
   };
 }
 
