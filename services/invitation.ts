@@ -3,6 +3,8 @@ import {
   PrismaClient,
   TeamRole,
 } from "@/app/generated/prisma/client";
+import { ActivityType } from "@/app/generated/prisma/enums";
+import { createActivity } from "./activity";
 
 export async function inviteMember(
   prisma: PrismaClient,
@@ -49,7 +51,7 @@ export async function inviteMember(
     throw new Error("Invitation already exists.");
   }
 
-  return prisma.teamInvitation.create({
+  const invitation = await prisma.teamInvitation.create({
     data: {
       email,
       teamId,
@@ -60,6 +62,15 @@ export async function inviteMember(
       team: true,
     },
   });
+
+  await createActivity(prisma, {
+    type: ActivityType.MEMBER_INVITED,
+    message: `Invited ${email} to team "${invitation.team.name}"`,
+    userId,
+    teamId,
+  });
+
+  return invitation;
 }
 
 export async function getMyInvitations(prisma: PrismaClient, email: string) {
@@ -87,6 +98,9 @@ export async function acceptInvitation(
   const invitation = await prisma.teamInvitation.findUnique({
     where: {
       id: invitationId,
+    },
+    include: {
+      team: true,
     },
   });
 
@@ -119,6 +133,13 @@ export async function acceptInvitation(
       },
     }),
   ]);
+
+  await createActivity(prisma, {
+    type: ActivityType.MEMBER_JOINED,
+    message: `${email} joined team "${invitation.team.name}"`,
+    userId,
+    teamId: invitation.teamId,
+  });
 
   return true;
 }

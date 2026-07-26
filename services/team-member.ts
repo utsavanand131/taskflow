@@ -1,4 +1,6 @@
 import { PrismaClient, TeamRole } from "@/app/generated/prisma/client";
+import { ActivityType } from "@/app/generated/prisma/enums";
+import { createActivity } from "./activity";
 
 export async function getTeamMembers(
   prisma: PrismaClient,
@@ -52,6 +54,10 @@ export async function removeTeamMember(
       teamId,
       userId: targetUserId,
     },
+    include: {
+      user: true,
+      team: true,
+    },
   });
 
   if (!targetMember) {
@@ -61,6 +67,13 @@ export async function removeTeamMember(
   if (targetMember.role === TeamRole.OWNER) {
     throw new Error("The team owner cannot be removed.");
   }
+
+  await createActivity(prisma, {
+    type: ActivityType.MEMBER_REMOVED,
+    message: `Removed ${targetMember.user.email} from team "${targetMember.team.name}"`,
+    userId: currentUserId,
+    teamId,
+  });
 
   await prisma.teamMember.delete({
     where: {

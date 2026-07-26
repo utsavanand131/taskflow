@@ -1,4 +1,6 @@
 import { PrismaClient, TeamRole } from "@/app/generated/prisma/client";
+import { ActivityType } from "@/app/generated/prisma/enums";
+import { createActivity } from "./activity";
 
 interface CreateTeamInput {
   name: string;
@@ -15,7 +17,7 @@ export async function createTeam(
   userId: string,
   input: CreateTeamInput,
 ) {
-  return prisma.team.create({
+  const team = await prisma.team.create({
     data: {
       name: input.name,
       description: input.description,
@@ -34,6 +36,15 @@ export async function createTeam(
       },
     },
   });
+
+  await createActivity(prisma, {
+    type: ActivityType.TEAM_CREATED,
+    message: `Created team "${team.name}"`,
+    userId,
+    teamId: team.id,
+  });
+
+  return team;
 }
 
 export async function getTeams(prisma: PrismaClient, userId: string) {
