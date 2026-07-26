@@ -1,4 +1,6 @@
 import { PrismaClient } from "@/app/generated/prisma/client";
+import { ActivityType } from "@/app/generated/prisma/enums";
+import { createActivity } from "./activity";
 
 interface CreateProjectInput {
   name: string;
@@ -31,7 +33,7 @@ export async function createProject(
     }
   }
 
-  return prisma.project.create({
+  const project = await prisma.project.create({
     data: {
       name: input.name,
       description: input.description,
@@ -44,6 +46,15 @@ export async function createProject(
       team: true,
     },
   });
+
+  await createActivity(prisma, {
+    type: ActivityType.PROJECT_CREATED,
+    message: `Created project "${project.name}"`,
+    userId: ownerId,
+    projectId: project.id,
+  });
+
+  return project;
 }
 
 export async function getProjects(prisma: PrismaClient, ownerId: string) {
@@ -134,7 +145,7 @@ export async function updateProject(
     return null;
   }
 
-  return prisma.project.update({
+  const updatedProject = await prisma.project.update({
     where: {
       id: projectId,
     },
@@ -146,6 +157,15 @@ export async function updateProject(
       team: true,
     },
   });
+
+  await createActivity(prisma, {
+    type: ActivityType.PROJECT_UPDATED,
+    message: `Updated project "${updatedProject.name}"`,
+    userId: ownerId,
+    projectId: updatedProject.id,
+  });
+
+  return updatedProject;
 }
 
 export async function deleteProject(
@@ -176,6 +196,13 @@ export async function deleteProject(
   if (!project) {
     return false;
   }
+
+  await createActivity(prisma, {
+    type: ActivityType.PROJECT_DELETED,
+    message: `Deleted project "${project.name}"`,
+    userId: ownerId,
+    projectId: project.id,
+  });
 
   await prisma.project.delete({
     where: {
