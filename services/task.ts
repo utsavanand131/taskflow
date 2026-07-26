@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { PrismaClient } from "@/app/generated/prisma/client";
 import { TaskPriority, TaskStatus } from "@/app/generated/prisma/enums";
 
 interface CreateTaskInput {
@@ -10,11 +10,36 @@ interface CreateTaskInput {
   dueDate?: string;
 }
 
-export async function createTask(userId: string, input: CreateTaskInput) {
+interface UpdateTaskInput {
+  title?: string;
+  description?: string;
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  dueDate?: string;
+}
+
+export async function createTask(
+  prisma: PrismaClient,
+  userId: string,
+  input: CreateTaskInput,
+) {
   const project = await prisma.project.findFirst({
     where: {
       id: input.projectId,
-      ownerId: userId,
+      OR: [
+        {
+          ownerId: userId,
+        },
+        {
+          team: {
+            members: {
+              some: {
+                userId,
+              },
+            },
+          },
+        },
+      ],
     },
   });
 
@@ -32,15 +57,37 @@ export async function createTask(userId: string, input: CreateTaskInput) {
       projectId: input.projectId,
     },
     include: {
-      project: true,
+      project: {
+        include: {
+          team: true,
+        },
+      },
     },
   });
 }
-export async function getTasks(userId: string, projectId: string) {
+
+export async function getTasks(
+  prisma: PrismaClient,
+  userId: string,
+  projectId: string,
+) {
   const project = await prisma.project.findFirst({
     where: {
       id: projectId,
-      ownerId: userId,
+      OR: [
+        {
+          ownerId: userId,
+        },
+        {
+          team: {
+            members: {
+              some: {
+                userId,
+              },
+            },
+          },
+        },
+      ],
     },
   });
 
@@ -53,35 +100,54 @@ export async function getTasks(userId: string, projectId: string) {
       projectId,
     },
     include: {
-      project: true,
+      project: {
+        include: {
+          team: true,
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",
     },
   });
 }
-export async function getTaskById(userId: string, taskId: string) {
+
+export async function getTaskById(
+  prisma: PrismaClient,
+  userId: string,
+  taskId: string,
+) {
   return prisma.task.findFirst({
     where: {
       id: taskId,
       project: {
-        ownerId: userId,
+        OR: [
+          {
+            ownerId: userId,
+          },
+          {
+            team: {
+              members: {
+                some: {
+                  userId,
+                },
+              },
+            },
+          },
+        ],
       },
     },
     include: {
-      project: true,
+      project: {
+        include: {
+          team: true,
+        },
+      },
     },
   });
 }
-interface UpdateTaskInput {
-  title?: string;
-  description?: string;
-  status?: TaskStatus;
-  priority?: TaskPriority;
-  dueDate?: string;
-}
-
 export async function updateTask(
+  prisma: PrismaClient,
   userId: string,
   taskId: string,
   input: UpdateTaskInput,
@@ -90,7 +156,20 @@ export async function updateTask(
     where: {
       id: taskId,
       project: {
-        ownerId: userId,
+        OR: [
+          {
+            ownerId: userId,
+          },
+          {
+            team: {
+              members: {
+                some: {
+                  userId,
+                },
+              },
+            },
+          },
+        ],
       },
     },
   });
@@ -111,16 +190,37 @@ export async function updateTask(
       dueDate: input.dueDate ? new Date(input.dueDate) : undefined,
     },
     include: {
-      project: true,
+      project: {
+        include: {
+          team: true,
+        },
+      },
     },
   });
 }
-export async function deleteTask(userId: string, taskId: string) {
+export async function deleteTask(
+  prisma: PrismaClient,
+  userId: string,
+  taskId: string,
+) {
   const task = await prisma.task.findFirst({
     where: {
       id: taskId,
       project: {
-        ownerId: userId,
+        OR: [
+          {
+            ownerId: userId,
+          },
+          {
+            team: {
+              members: {
+                some: {
+                  userId,
+                },
+              },
+            },
+          },
+        ],
       },
     },
   });
