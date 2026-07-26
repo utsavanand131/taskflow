@@ -1,5 +1,10 @@
 import { PrismaClient } from "@/app/generated/prisma/client";
-import { TaskPriority, TaskStatus } from "@/app/generated/prisma/enums";
+import {
+  ActivityType,
+  TaskPriority,
+  TaskStatus,
+} from "@/app/generated/prisma/enums";
+import { createActivity } from "./activity";
 
 interface CreateTaskInput {
   projectId: string;
@@ -47,7 +52,7 @@ export async function createTask(
     return null;
   }
 
-  return prisma.task.create({
+  const task = await prisma.task.create({
     data: {
       title: input.title,
       description: input.description,
@@ -64,6 +69,16 @@ export async function createTask(
       },
     },
   });
+
+  await createActivity(prisma, {
+    type: ActivityType.TASK_CREATED,
+    message: `Created task "${task.title}"`,
+    userId,
+    projectId: task.projectId,
+    taskId: task.id,
+  });
+
+  return task;
 }
 
 export async function getTasks(
@@ -146,6 +161,7 @@ export async function getTaskById(
     },
   });
 }
+
 export async function updateTask(
   prisma: PrismaClient,
   userId: string,
@@ -178,7 +194,7 @@ export async function updateTask(
     return null;
   }
 
-  return prisma.task.update({
+  const updatedTask = await prisma.task.update({
     where: {
       id: taskId,
     },
@@ -197,7 +213,18 @@ export async function updateTask(
       },
     },
   });
+
+  await createActivity(prisma, {
+    type: ActivityType.TASK_UPDATED,
+    message: `Updated task "${updatedTask.title}"`,
+    userId,
+    projectId: updatedTask.projectId,
+    taskId: updatedTask.id,
+  });
+
+  return updatedTask;
 }
+
 export async function deleteTask(
   prisma: PrismaClient,
   userId: string,
@@ -228,6 +255,14 @@ export async function deleteTask(
   if (!task) {
     return false;
   }
+
+  await createActivity(prisma, {
+    type: ActivityType.TASK_DELETED,
+    message: `Deleted task "${task.title}"`,
+    userId,
+    projectId: task.projectId,
+    taskId: task.id,
+  });
 
   await prisma.task.delete({
     where: {
