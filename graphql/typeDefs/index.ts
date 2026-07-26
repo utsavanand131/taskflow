@@ -6,6 +6,8 @@ import { taskTypeDefs } from "./task";
 import { teamTypeDefs } from "./team";
 import { commentTypeDefs } from "./comment";
 import { invitationTypeDefs } from "./invitation";
+import { dashboardTypeDefs } from "./dashboard";
+import { activityTypeDefs } from "./activity";
 
 const baseTypeDefs = gql`
   type Query {
@@ -25,4 +27,6 @@ export const typeDefs = [
   teamTypeDefs,
   commentTypeDefs,
   invitationTypeDefs,
+  activityTypeDefs,
+  dashboardTypeDefs,
 ];
