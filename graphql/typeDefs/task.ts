@@ -26,6 +26,13 @@ export const taskTypeDefs = gql`
     updatedAt: String!
   }
 
+  type TaskPage {
+    items: [Task!]!
+    total: Int!
+    page: Int!
+    totalPages: Int!
+  }
+
   input CreateTaskInput {
     projectId: ID!
     title: String!
@@ -45,7 +52,15 @@ export const taskTypeDefs = gql`
 
   extend type Query {
     tasks(projectId: ID!): [Task!]!
+
     task(id: ID!): Task
+
+    searchTasks(
+      projectId: ID!
+      search: String
+      page: Int = 1
+      limit: Int = 10
+    ): TaskPage!
   }
 
   extend type Mutation {

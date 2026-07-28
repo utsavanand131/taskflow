@@ -1,10 +1,11 @@
 import { requireAuth } from "@/lib/require-auth";
 import {
   createTask,
+  deleteTask,
   getTaskById,
   getTasks,
+  searchTasks,
   updateTask,
-  deleteTask,
 } from "@/services/task";
 
 export const taskResolvers = {
@@ -17,6 +18,33 @@ export const taskResolvers = {
       const user = requireAuth(context);
 
       return getTasks(context.prisma, user.id, projectId);
+    },
+
+    searchTasks: async (
+      _: unknown,
+      {
+        projectId,
+        search,
+        page,
+        limit,
+      }: {
+        projectId: string;
+        search?: string;
+        page?: number;
+        limit?: number;
+      },
+      context: any,
+    ) => {
+      const user = requireAuth(context);
+
+      return searchTasks(
+        context.prisma,
+        user.id,
+        projectId,
+        search ?? "",
+        page ?? 1,
+        limit ?? 10,
+      );
     },
 
     task: async (_: unknown, { id }: { id: string }, context: any) => {

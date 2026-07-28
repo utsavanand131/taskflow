@@ -23,6 +23,25 @@ interface UpdateTaskInput {
   dueDate?: string;
 }
 
+function getTaskAccessWhere(userId: string) {
+  return {
+    OR: [
+      {
+        ownerId: userId,
+      },
+      {
+        team: {
+          members: {
+            some: {
+              userId,
+            },
+          },
+        },
+      },
+    ],
+  };
+}
+
 export async function createTask(
   prisma: PrismaClient,
   userId: string,
@@ -31,20 +50,7 @@ export async function createTask(
   const project = await prisma.project.findFirst({
     where: {
       id: input.projectId,
-      OR: [
-        {
-          ownerId: userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
-              },
-            },
-          },
-        },
-      ],
+      ...getTaskAccessWhere(userId),
     },
   });
 
@@ -89,20 +95,7 @@ export async function getTasks(
   const project = await prisma.project.findFirst({
     where: {
       id: projectId,
-      OR: [
-        {
-          ownerId: userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
-              },
-            },
-          },
-        },
-      ],
+      ...getTaskAccessWhere(userId),
     },
   });
 
@@ -126,6 +119,70 @@ export async function getTasks(
     },
   });
 }
+export async function searchTasks(
+  prisma: PrismaClient,
+  userId: string,
+  projectId: string,
+  search: string,
+  page: number,
+  limit: number,
+) {
+  const project = await prisma.project.findFirst({
+    where: {
+      id: projectId,
+      ...getTaskAccessWhere(userId),
+    },
+  });
+
+  if (!project) {
+    return {
+      items: [],
+      total: 0,
+      page,
+      totalPages: 0,
+    };
+  }
+
+  const where = {
+    projectId,
+
+    ...(search && {
+      title: {
+        contains: search,
+      },
+    }),
+  };
+
+  const total = await prisma.task.count({
+    where,
+  });
+
+  const items = await prisma.task.findMany({
+    where,
+
+    include: {
+      project: {
+        include: {
+          team: true,
+        },
+      },
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+
+    skip: (page - 1) * limit,
+    take: limit,
+  });
+
+  return {
+    items,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
+}
 
 export async function getTaskById(
   prisma: PrismaClient,
@@ -135,22 +192,7 @@ export async function getTaskById(
   return prisma.task.findFirst({
     where: {
       id: taskId,
-      project: {
-        OR: [
-          {
-            ownerId: userId,
-          },
-          {
-            team: {
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          },
-        ],
-      },
+      project: getTaskAccessWhere(userId),
     },
     include: {
       project: {
@@ -171,22 +213,7 @@ export async function updateTask(
   const task = await prisma.task.findFirst({
     where: {
       id: taskId,
-      project: {
-        OR: [
-          {
-            ownerId: userId,
-          },
-          {
-            team: {
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          },
-        ],
-      },
+      project: getTaskAccessWhere(userId),
     },
   });
 
@@ -233,22 +260,7 @@ export async function deleteTask(
   const task = await prisma.task.findFirst({
     where: {
       id: taskId,
-      project: {
-        OR: [
-          {
-            ownerId: userId,
-          },
-          {
-            team: {
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          },
-        ],
-      },
+      project: getTaskAccessWhere(userId),
     },
   });
 
