@@ -92,6 +92,11 @@ export async function createTask(
           createdAt: "asc",
         },
       },
+      labels: {
+        orderBy: {
+          name: "asc",
+        },
+      },
     },
   });
 
@@ -139,6 +144,11 @@ export async function getTasks(
         },
         orderBy: {
           createdAt: "asc",
+        },
+      },
+      labels: {
+        orderBy: {
+          name: "asc",
         },
       },
     },
@@ -204,6 +214,11 @@ export async function searchTasks(
           createdAt: "asc",
         },
       },
+      labels: {
+        orderBy: {
+          name: "asc",
+        },
+      },
     },
 
     orderBy: {
@@ -245,6 +260,11 @@ export async function getTaskById(
         },
         orderBy: {
           createdAt: "asc",
+        },
+      },
+      labels: {
+        orderBy: {
+          name: "asc",
         },
       },
     },
@@ -292,6 +312,11 @@ export async function updateTask(
         },
         orderBy: {
           createdAt: "asc",
+        },
+      },
+      labels: {
+        orderBy: {
+          name: "asc",
         },
       },
     },
@@ -375,6 +400,11 @@ export async function assignTask(
           createdAt: "asc",
         },
       },
+      labels: {
+        orderBy: {
+          name: "asc",
+        },
+      },
     },
   });
 
@@ -391,6 +421,162 @@ export async function assignTask(
   return updatedTask;
 }
 
+export async function createLabel(
+  prisma: PrismaClient,
+  name: string,
+  color?: string,
+) {
+  return prisma.label.create({
+    data: {
+      name,
+      color,
+    },
+  });
+}
+
+export async function assignLabel(
+  prisma: PrismaClient,
+  userId: string,
+  taskId: string,
+  labelId: string,
+) {
+  const task = await prisma.task.findFirst({
+    where: {
+      id: taskId,
+      project: getTaskAccessWhere(userId),
+    },
+  });
+
+  if (!task) {
+    return null;
+  }
+
+  const label = await prisma.label.findUnique({
+    where: {
+      id: labelId,
+    },
+  });
+
+  if (!label) {
+    throw new Error("Label not found.");
+  }
+
+  const updatedTask = await prisma.task.update({
+    where: {
+      id: taskId,
+    },
+    data: {
+      labels: {
+        connect: {
+          id: labelId,
+        },
+      },
+    },
+    include: {
+      project: {
+        include: {
+          team: true,
+        },
+      },
+      assignee: true,
+      comments: {
+        include: {
+          author: true,
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+      },
+      labels: {
+        orderBy: {
+          name: "asc",
+        },
+      },
+    },
+  });
+
+  await createActivity(prisma, {
+    type: ActivityType.TASK_UPDATED,
+    message: `Added label "${label.name}" to task "${updatedTask.title}"`,
+    userId,
+    projectId: updatedTask.projectId,
+    taskId: updatedTask.id,
+  });
+
+  return updatedTask;
+}
+
+export async function removeLabel(
+  prisma: PrismaClient,
+  userId: string,
+  taskId: string,
+  labelId: string,
+) {
+  const task = await prisma.task.findFirst({
+    where: {
+      id: taskId,
+      project: getTaskAccessWhere(userId),
+    },
+  });
+
+  if (!task) {
+    return null;
+  }
+
+  const label = await prisma.label.findUnique({
+    where: {
+      id: labelId,
+    },
+  });
+
+  if (!label) {
+    throw new Error("Label not found.");
+  }
+
+  const updatedTask = await prisma.task.update({
+    where: {
+      id: taskId,
+    },
+    data: {
+      labels: {
+        disconnect: {
+          id: labelId,
+        },
+      },
+    },
+    include: {
+      project: {
+        include: {
+          team: true,
+        },
+      },
+      assignee: true,
+      comments: {
+        include: {
+          author: true,
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+      },
+      labels: {
+        orderBy: {
+          name: "asc",
+        },
+      },
+    },
+  });
+
+  await createActivity(prisma, {
+    type: ActivityType.TASK_UPDATED,
+    message: `Removed label "${label.name}" from task "${updatedTask.title}"`,
+    userId,
+    projectId: updatedTask.projectId,
+    taskId: updatedTask.id,
+  });
+
+  return updatedTask;
+}
 export async function addComment(
   prisma: PrismaClient,
   userId: string,
@@ -415,7 +601,15 @@ export async function addComment(
     },
     include: {
       author: true,
-      task: true,
+      task: {
+        include: {
+          labels: {
+            orderBy: {
+              name: "asc",
+            },
+          },
+        },
+      },
     },
   });
 
@@ -458,7 +652,15 @@ export async function updateComment(
     },
     include: {
       author: true,
-      task: true,
+      task: {
+        include: {
+          labels: {
+            orderBy: {
+              name: "asc",
+            },
+          },
+        },
+      },
     },
   });
 

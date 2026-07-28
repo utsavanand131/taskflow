@@ -23,6 +23,12 @@ export const taskTypeDefs = gql`
     updatedAt: String!
   }
 
+  type Label {
+    id: ID!
+    name: String!
+    color: String
+  }
+
   type Task {
     id: ID!
     title: String!
@@ -33,6 +39,7 @@ export const taskTypeDefs = gql`
     project: Project!
     assignee: User
     comments: [Comment!]!
+    labels: [Label!]!
     createdAt: String!
     updatedAt: String!
   }
@@ -86,6 +93,12 @@ export const taskTypeDefs = gql`
     updateComment(commentId: ID!, content: String!): Comment!
 
     deleteComment(commentId: ID!): Boolean!
+
+    createLabel(name: String!, color: String): Label!
+
+    assignLabel(taskId: ID!, labelId: ID!): Task!
+
+    removeLabel(taskId: ID!, labelId: ID!): Task!
 
     deleteTask(id: ID!): Boolean!
   }

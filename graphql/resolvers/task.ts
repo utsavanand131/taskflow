@@ -1,12 +1,15 @@
 import { requireAuth } from "@/lib/require-auth";
 import {
   addComment,
+  assignLabel,
   assignTask,
+  createLabel,
   createTask,
   deleteComment,
   deleteTask,
   getTaskById,
   getTasks,
+  removeLabel,
   searchTasks,
   updateComment,
   updateTask,
@@ -184,6 +187,66 @@ export const taskResolvers = {
       }
 
       return true;
+    },
+
+    createLabel: async (
+      _: unknown,
+      {
+        name,
+        color,
+      }: {
+        name: string;
+        color?: string;
+      },
+      context: any,
+    ) => {
+      requireAuth(context);
+
+      return createLabel(context.prisma, name, color);
+    },
+
+    assignLabel: async (
+      _: unknown,
+      {
+        taskId,
+        labelId,
+      }: {
+        taskId: string;
+        labelId: string;
+      },
+      context: any,
+    ) => {
+      const user = requireAuth(context);
+
+      const task = await assignLabel(context.prisma, user.id, taskId, labelId);
+
+      if (!task) {
+        throw new Error("Task not found.");
+      }
+
+      return task;
+    },
+
+    removeLabel: async (
+      _: unknown,
+      {
+        taskId,
+        labelId,
+      }: {
+        taskId: string;
+        labelId: string;
+      },
+      context: any,
+    ) => {
+      const user = requireAuth(context);
+
+      const task = await removeLabel(context.prisma, user.id, taskId, labelId);
+
+      if (!task) {
+        throw new Error("Task not found.");
+      }
+
+      return task;
     },
 
     deleteTask: async (_: unknown, { id }: { id: string }, context: any) => {
