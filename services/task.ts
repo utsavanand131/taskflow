@@ -33,6 +33,14 @@ interface UpdateCommentInput {
   content: string;
 }
 
+interface UploadAttachmentInput {
+  taskId: string;
+  fileName: string;
+  fileUrl: string;
+  fileSize?: number;
+  mimeType?: string;
+}
+
 function getTaskAccessWhere(userId: string) {
   return {
     OR: [
@@ -97,6 +105,14 @@ export async function createTask(
           name: "asc",
         },
       },
+      attachments: {
+        include: {
+          uploadedBy: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
     },
   });
 
@@ -149,6 +165,14 @@ export async function getTasks(
       labels: {
         orderBy: {
           name: "asc",
+        },
+      },
+      attachments: {
+        include: {
+          uploadedBy: true,
+        },
+        orderBy: {
+          createdAt: "desc",
         },
       },
     },
@@ -219,6 +243,14 @@ export async function searchTasks(
           name: "asc",
         },
       },
+      attachments: {
+        include: {
+          uploadedBy: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
     },
 
     orderBy: {
@@ -265,6 +297,14 @@ export async function getTaskById(
       labels: {
         orderBy: {
           name: "asc",
+        },
+      },
+      attachments: {
+        include: {
+          uploadedBy: true,
+        },
+        orderBy: {
+          createdAt: "desc",
         },
       },
     },
@@ -317,6 +357,14 @@ export async function updateTask(
       labels: {
         orderBy: {
           name: "asc",
+        },
+      },
+      attachments: {
+        include: {
+          uploadedBy: true,
+        },
+        orderBy: {
+          createdAt: "desc",
         },
       },
     },
@@ -403,6 +451,14 @@ export async function assignTask(
       labels: {
         orderBy: {
           name: "asc",
+        },
+      },
+      attachments: {
+        include: {
+          uploadedBy: true,
+        },
+        orderBy: {
+          createdAt: "desc",
         },
       },
     },
@@ -492,6 +548,14 @@ export async function assignLabel(
           name: "asc",
         },
       },
+      attachments: {
+        include: {
+          uploadedBy: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
     },
   });
 
@@ -564,6 +628,14 @@ export async function removeLabel(
           name: "asc",
         },
       },
+      attachments: {
+        include: {
+          uploadedBy: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
     },
   });
 
@@ -576,6 +648,85 @@ export async function removeLabel(
   });
 
   return updatedTask;
+}
+
+export async function uploadAttachment(
+  prisma: PrismaClient,
+  userId: string,
+  input: UploadAttachmentInput,
+) {
+  const task = await prisma.task.findFirst({
+    where: {
+      id: input.taskId,
+      project: getTaskAccessWhere(userId),
+    },
+  });
+
+  if (!task) {
+    return null;
+  }
+
+  const attachment = await prisma.attachment.create({
+    data: {
+      taskId: input.taskId,
+      uploadedById: userId,
+      fileName: input.fileName,
+      fileUrl: input.fileUrl,
+      fileSize: input.fileSize,
+      mimeType: input.mimeType,
+    },
+    include: {
+      uploadedBy: true,
+    },
+  });
+
+  await createActivity(prisma, {
+    type: ActivityType.TASK_UPDATED,
+    message: `Uploaded "${attachment.fileName}" to task "${task.title}"`,
+    userId,
+    projectId: task.projectId,
+    taskId: task.id,
+  });
+
+  return attachment;
+}
+
+export async function deleteAttachment(
+  prisma: PrismaClient,
+  userId: string,
+  attachmentId: string,
+) {
+  const attachment = await prisma.attachment.findFirst({
+    where: {
+      id: attachmentId,
+      task: {
+        project: getTaskAccessWhere(userId),
+      },
+    },
+    include: {
+      task: true,
+    },
+  });
+
+  if (!attachment) {
+    return false;
+  }
+
+  await createActivity(prisma, {
+    type: ActivityType.TASK_UPDATED,
+    message: `Deleted attachment "${attachment.fileName}" from task "${attachment.task.title}"`,
+    userId,
+    projectId: attachment.task.projectId,
+    taskId: attachment.task.id,
+  });
+
+  await prisma.attachment.delete({
+    where: {
+      id: attachmentId,
+    },
+  });
+
+  return true;
 }
 export async function addComment(
   prisma: PrismaClient,
@@ -606,6 +757,14 @@ export async function addComment(
           labels: {
             orderBy: {
               name: "asc",
+            },
+          },
+          attachments: {
+            include: {
+              uploadedBy: true,
+            },
+            orderBy: {
+              createdAt: "desc",
             },
           },
         },
@@ -659,6 +818,14 @@ export async function updateComment(
               name: "asc",
             },
           },
+          attachments: {
+            include: {
+              uploadedBy: true,
+            },
+            orderBy: {
+              createdAt: "desc",
+            },
+          },
         },
       },
     },
@@ -710,7 +877,6 @@ export async function deleteComment(
 
   return true;
 }
-
 export async function deleteTask(
   prisma: PrismaClient,
   userId: string,

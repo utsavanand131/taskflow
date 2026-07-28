@@ -29,6 +29,16 @@ export const taskTypeDefs = gql`
     color: String
   }
 
+  type Attachment {
+    id: ID!
+    fileName: String!
+    fileUrl: String!
+    fileSize: Int
+    mimeType: String
+    uploadedBy: User!
+    createdAt: String!
+  }
+
   type Task {
     id: ID!
     title: String!
@@ -40,6 +50,7 @@ export const taskTypeDefs = gql`
     assignee: User
     comments: [Comment!]!
     labels: [Label!]!
+    attachments: [Attachment!]!
     createdAt: String!
     updatedAt: String!
   }
@@ -99,6 +110,16 @@ export const taskTypeDefs = gql`
     assignLabel(taskId: ID!, labelId: ID!): Task!
 
     removeLabel(taskId: ID!, labelId: ID!): Task!
+
+    uploadAttachment(
+      taskId: ID!
+      fileName: String!
+      fileUrl: String!
+      fileSize: Int
+      mimeType: String
+    ): Attachment!
+
+    deleteAttachment(attachmentId: ID!): Boolean!
 
     deleteTask(id: ID!): Boolean!
   }

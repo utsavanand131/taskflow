@@ -5,6 +5,7 @@ import {
   assignTask,
   createLabel,
   createTask,
+  deleteAttachment,
   deleteComment,
   deleteTask,
   getTaskById,
@@ -13,6 +14,7 @@ import {
   searchTasks,
   updateComment,
   updateTask,
+  uploadAttachment,
 } from "@/services/task";
 
 export const taskResolvers = {
@@ -247,6 +249,60 @@ export const taskResolvers = {
       }
 
       return task;
+    },
+
+    uploadAttachment: async (
+      _: unknown,
+      {
+        taskId,
+        fileName,
+        fileUrl,
+        fileSize,
+        mimeType,
+      }: {
+        taskId: string;
+        fileName: string;
+        fileUrl: string;
+        fileSize?: number;
+        mimeType?: string;
+      },
+      context: any,
+    ) => {
+      const user = requireAuth(context);
+
+      const attachment = await uploadAttachment(context.prisma, user.id, {
+        taskId,
+        fileName,
+        fileUrl,
+        fileSize,
+        mimeType,
+      });
+
+      if (!attachment) {
+        throw new Error("Task not found.");
+      }
+
+      return attachment;
+    },
+
+    deleteAttachment: async (
+      _: unknown,
+      { attachmentId }: { attachmentId: string },
+      context: any,
+    ) => {
+      const user = requireAuth(context);
+
+      const deleted = await deleteAttachment(
+        context.prisma,
+        user.id,
+        attachmentId,
+      );
+
+      if (!deleted) {
+        throw new Error("Attachment not found.");
+      }
+
+      return true;
     },
 
     deleteTask: async (_: unknown, { id }: { id: string }, context: any) => {
