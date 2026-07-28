@@ -14,6 +14,15 @@ export const taskTypeDefs = gql`
     URGENT
   }
 
+  type Comment {
+    id: ID!
+    content: String!
+    author: User!
+    task: Task!
+    createdAt: String!
+    updatedAt: String!
+  }
+
   type Task {
     id: ID!
     title: String!
@@ -23,6 +32,7 @@ export const taskTypeDefs = gql`
     dueDate: String
     project: Project!
     assignee: User
+    comments: [Comment!]!
     createdAt: String!
     updatedAt: String!
   }
@@ -70,6 +80,12 @@ export const taskTypeDefs = gql`
     updateTask(id: ID!, input: UpdateTaskInput!): Task!
 
     assignTask(taskId: ID!, assigneeId: ID): Task!
+
+    addComment(taskId: ID!, content: String!): Comment!
+
+    updateComment(commentId: ID!, content: String!): Comment!
+
+    deleteComment(commentId: ID!): Boolean!
 
     deleteTask(id: ID!): Boolean!
   }

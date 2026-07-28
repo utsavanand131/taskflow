@@ -1,11 +1,14 @@
 import { requireAuth } from "@/lib/require-auth";
 import {
+  addComment,
   assignTask,
   createTask,
+  deleteComment,
   deleteTask,
   getTaskById,
   getTasks,
   searchTasks,
+  updateComment,
   updateTask,
 } from "@/services/task";
 
@@ -115,6 +118,72 @@ export const taskResolvers = {
       }
 
       return task;
+    },
+
+    addComment: async (
+      _: unknown,
+      {
+        taskId,
+        content,
+      }: {
+        taskId: string;
+        content: string;
+      },
+      context: any,
+    ) => {
+      const user = requireAuth(context);
+
+      const comment = await addComment(context.prisma, user.id, {
+        taskId,
+        content,
+      });
+
+      if (!comment) {
+        throw new Error("Task not found.");
+      }
+
+      return comment;
+    },
+
+    updateComment: async (
+      _: unknown,
+      {
+        commentId,
+        content,
+      }: {
+        commentId: string;
+        content: string;
+      },
+      context: any,
+    ) => {
+      const user = requireAuth(context);
+
+      const comment = await updateComment(context.prisma, user.id, {
+        commentId,
+        content,
+      });
+
+      if (!comment) {
+        throw new Error("Comment not found.");
+      }
+
+      return comment;
+    },
+
+    deleteComment: async (
+      _: unknown,
+      { commentId }: { commentId: string },
+      context: any,
+    ) => {
+      const user = requireAuth(context);
+
+      const deleted = await deleteComment(context.prisma, user.id, commentId);
+
+      if (!deleted) {
+        throw new Error("Comment not found.");
+      }
+
+      return true;
     },
 
     deleteTask: async (_: unknown, { id }: { id: string }, context: any) => {
