@@ -12,6 +12,13 @@ export const projectTypeDefs = gql`
     updatedAt: String!
   }
 
+  type ProjectPage {
+    items: [Project!]!
+    total: Int!
+    page: Int!
+    totalPages: Int!
+  }
+
   input CreateProjectInput {
     name: String!
     description: String
@@ -27,7 +34,10 @@ export const projectTypeDefs = gql`
 
   extend type Query {
     projects: [Project!]!
+
     project(id: ID!): Project
+
+    searchProjects(search: String, page: Int = 1, limit: Int = 10): ProjectPage!
   }
 
   extend type Mutation {

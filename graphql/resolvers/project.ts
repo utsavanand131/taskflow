@@ -6,6 +6,7 @@ import {
   deleteProject,
   getProjectById,
   getProjects,
+  searchProjects,
   updateProject,
 } from "@/services/project";
 
@@ -31,6 +32,12 @@ interface ProjectArgs {
   id: string;
 }
 
+interface SearchProjectsArgs {
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
 export const projectResolvers = {
   Query: {
     projects: async (
@@ -41,6 +48,22 @@ export const projectResolvers = {
       const user = requireAuth(context);
 
       return getProjects(context.prisma, user.id);
+    },
+
+    searchProjects: async (
+      _parent: unknown,
+      args: SearchProjectsArgs,
+      context: GraphQLContext,
+    ) => {
+      const user = requireAuth(context);
+
+      return searchProjects(
+        context.prisma,
+        user.id,
+        args.search ?? "",
+        args.page ?? 1,
+        args.limit ?? 10,
+      );
     },
 
     project: async (
