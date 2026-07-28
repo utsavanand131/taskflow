@@ -1,5 +1,6 @@
 import { requireAuth } from "@/lib/require-auth";
 import {
+  assignTask,
   createTask,
   deleteTask,
   getTaskById,
@@ -81,6 +82,33 @@ export const taskResolvers = {
       const user = requireAuth(context);
 
       const task = await updateTask(context.prisma, user.id, id, input);
+
+      if (!task) {
+        throw new Error("Task not found.");
+      }
+
+      return task;
+    },
+
+    assignTask: async (
+      _: unknown,
+      {
+        taskId,
+        assigneeId,
+      }: {
+        taskId: string;
+        assigneeId?: string | null;
+      },
+      context: any,
+    ) => {
+      const user = requireAuth(context);
+
+      const task = await assignTask(
+        context.prisma,
+        user.id,
+        taskId,
+        assigneeId ?? null,
+      );
 
       if (!task) {
         throw new Error("Task not found.");

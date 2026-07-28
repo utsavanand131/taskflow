@@ -22,6 +22,7 @@ export const taskTypeDefs = gql`
     priority: TaskPriority!
     dueDate: String
     project: Project!
+    assignee: User
     createdAt: String!
     updatedAt: String!
   }
@@ -67,6 +68,8 @@ export const taskTypeDefs = gql`
     createTask(input: CreateTaskInput!): Task!
 
     updateTask(id: ID!, input: UpdateTaskInput!): Task!
+
+    assignTask(taskId: ID!, assigneeId: ID): Task!
 
     deleteTask(id: ID!): Boolean!
   }

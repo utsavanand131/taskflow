@@ -1,0 +1,8 @@
+-- AlterTable
+ALTER TABLE `task` ADD COLUMN `assigneeId` VARCHAR(191) NULL;
+
+-- CreateIndex
+CREATE INDEX `Task_assigneeId_idx` ON `Task`(`assigneeId`);
+
+-- AddForeignKey
+ALTER TABLE `Task` ADD CONSTRAINT `Task_assigneeId_fkey` FOREIGN KEY (`assigneeId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;

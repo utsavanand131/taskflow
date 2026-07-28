@@ -73,6 +73,7 @@ export async function createTask(
           team: true,
         },
       },
+      assignee: true,
     },
   });
 
@@ -113,12 +114,14 @@ export async function getTasks(
           team: true,
         },
       },
+      assignee: true,
     },
     orderBy: {
       createdAt: "desc",
     },
   });
 }
+
 export async function searchTasks(
   prisma: PrismaClient,
   userId: string,
@@ -166,6 +169,7 @@ export async function searchTasks(
           team: true,
         },
       },
+      assignee: true,
     },
 
     orderBy: {
@@ -200,6 +204,7 @@ export async function getTaskById(
           team: true,
         },
       },
+      assignee: true,
     },
   });
 }
@@ -238,12 +243,88 @@ export async function updateTask(
           team: true,
         },
       },
+      assignee: true,
     },
   });
 
   await createActivity(prisma, {
     type: ActivityType.TASK_UPDATED,
     message: `Updated task "${updatedTask.title}"`,
+    userId,
+    projectId: updatedTask.projectId,
+    taskId: updatedTask.id,
+  });
+
+  return updatedTask;
+}
+export async function assignTask(
+  prisma: PrismaClient,
+  userId: string,
+  taskId: string,
+  assigneeId: string | null,
+) {
+  const task = await prisma.task.findFirst({
+    where: {
+      id: taskId,
+      project: getTaskAccessWhere(userId),
+    },
+    include: {
+      project: {
+        include: {
+          team: {
+            include: {
+              members: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!task) {
+    return null;
+  }
+
+  if (assigneeId) {
+    let canAssign = false;
+
+    if (task.project.ownerId === assigneeId) {
+      canAssign = true;
+    }
+
+    if (
+      task.project.team?.members.some((member) => member.userId === assigneeId)
+    ) {
+      canAssign = true;
+    }
+
+    if (!canAssign) {
+      throw new Error("User is not a member of this project.");
+    }
+  }
+
+  const updatedTask = await prisma.task.update({
+    where: {
+      id: taskId,
+    },
+    data: {
+      assigneeId,
+    },
+    include: {
+      project: {
+        include: {
+          team: true,
+        },
+      },
+      assignee: true,
+    },
+  });
+
+  await createActivity(prisma, {
+    type: ActivityType.TASK_UPDATED,
+    message: assigneeId
+      ? `Assigned task "${updatedTask.title}"`
+      : `Unassigned task "${updatedTask.title}"`,
     userId,
     projectId: updatedTask.projectId,
     taskId: updatedTask.id,
