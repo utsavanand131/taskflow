@@ -1,11 +1,18 @@
 import { gql } from "graphql-tag";
 
 export const projectTypeDefs = gql`
+  enum ProjectStatus {
+    ACTIVE
+    COMPLETED
+    ARCHIVED
+  }
+
   type Project {
     id: ID!
     name: String!
     description: String
     color: String
+    status: ProjectStatus!
     owner: User!
     team: Team
     createdAt: String!
@@ -30,6 +37,7 @@ export const projectTypeDefs = gql`
     name: String
     description: String
     color: String
+    status: ProjectStatus
   }
 
   extend type Query {

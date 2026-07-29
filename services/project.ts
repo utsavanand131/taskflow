@@ -1,5 +1,5 @@
 import { PrismaClient } from "@/app/generated/prisma/client";
-import { ActivityType } from "@/app/generated/prisma/enums";
+import { ActivityType, ProjectStatus } from "@/app/generated/prisma/enums";
 
 import { createActivity } from "./activity";
 
@@ -14,6 +14,7 @@ interface UpdateProjectInput {
   name?: string;
   description?: string;
   color?: string;
+  status?: ProjectStatus;
 }
 
 function getProjectAccessWhere(userId: string) {

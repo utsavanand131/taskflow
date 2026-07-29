@@ -25,9 +25,9 @@ interface UpdateProjectArgs {
     name?: string;
     description?: string;
     color?: string;
+    status?: "ACTIVE" | "COMPLETED" | "ARCHIVED";
   };
 }
-
 interface ProjectArgs {
   id: string;
 }

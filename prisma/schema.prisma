@@ -31,6 +31,11 @@ enum InvitationStatus {
   ACCEPTED
   REJECTED
 }
+enum ProjectStatus {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
 
 enum ActivityType {
   
@@ -95,6 +100,8 @@ model Project {
   description String?
   color       String?
 
+  status ProjectStatus @default(ACTIVE)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -109,6 +116,7 @@ model Project {
 
   @@index([ownerId])
   @@index([teamId])
+  @@index([status])
 }
 
 model Task {
