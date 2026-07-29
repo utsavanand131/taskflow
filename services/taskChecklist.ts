@@ -33,7 +33,7 @@ export async function addChecklistItem(
   });
 
   await createActivity(prisma, {
-    type: ActivityType.TASK_UPDATED,
+    type: ActivityType.CHECKLIST_ITEM_ADDED,
     message: `Added checklist item to task "${task.title}"`,
     userId,
     projectId: task.projectId,
@@ -78,7 +78,7 @@ export async function updateChecklistItem(
   });
 
   await createActivity(prisma, {
-    type: ActivityType.TASK_UPDATED,
+    type: ActivityType.CHECKLIST_ITEM_UPDATED,
     message: `Updated checklist item on task "${item.task.title}"`,
     userId,
     projectId: item.task.projectId,
@@ -122,8 +122,10 @@ export async function toggleChecklistItem(
   });
 
   await createActivity(prisma, {
-    type: ActivityType.TASK_UPDATED,
-    message: `${updatedItem.completed ? "Completed" : "Reopened"} checklist item on task "${item.task.title}"`,
+    type: ActivityType.CHECKLIST_ITEM_COMPLETED,
+    message: updatedItem.completed
+      ? `Completed checklist item on task "${item.task.title}"`
+      : `Reopened checklist item on task "${item.task.title}"`,
     userId,
     projectId: item.task.projectId,
     taskId: item.task.id,
@@ -131,6 +133,7 @@ export async function toggleChecklistItem(
 
   return updatedItem;
 }
+
 export async function deleteChecklistItem(
   prisma: PrismaClient,
   userId: string,
@@ -153,7 +156,7 @@ export async function deleteChecklistItem(
   }
 
   await createActivity(prisma, {
-    type: ActivityType.TASK_UPDATED,
+    type: ActivityType.CHECKLIST_ITEM_DELETED,
     message: `Deleted checklist item from task "${item.task.title}"`,
     userId,
     projectId: item.task.projectId,

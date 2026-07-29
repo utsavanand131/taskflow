@@ -159,7 +159,7 @@ export async function assignTask(
   });
 
   await createActivity(prisma, {
-    type: ActivityType.TASK_UPDATED,
+    type: ActivityType.TASK_ASSIGNED,
     message: assigneeId
       ? `Assigned task "${updatedTask.title}"`
       : `Unassigned task "${updatedTask.title}"`,
@@ -170,6 +170,7 @@ export async function assignTask(
 
   return updatedTask;
 }
+
 export async function deleteTask(
   prisma: PrismaClient,
   userId: string,

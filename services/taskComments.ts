@@ -1,5 +1,6 @@
 import { PrismaClient } from "@/app/generated/prisma/client";
 import { ActivityType } from "@/app/generated/prisma/enums";
+
 import { createActivity } from "./activity";
 import { AddCommentInput, UpdateCommentInput } from "./taskTypes";
 import { getTaskAccessWhere } from "./taskUtils";
@@ -49,7 +50,7 @@ export async function addComment(
   });
 
   await createActivity(prisma, {
-    type: ActivityType.TASK_UPDATED,
+    type: ActivityType.COMMENT_ADDED,
     message: `Commented on task "${task.title}"`,
     userId,
     projectId: task.projectId,

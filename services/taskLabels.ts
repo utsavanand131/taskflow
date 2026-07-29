@@ -1,5 +1,6 @@
 import { PrismaClient } from "@/app/generated/prisma/client";
 import { ActivityType } from "@/app/generated/prisma/enums";
+
 import { createActivity } from "./activity";
 import { getTaskAccessWhere, taskInclude } from "./taskUtils";
 
@@ -58,7 +59,7 @@ export async function assignLabel(
   });
 
   await createActivity(prisma, {
-    type: ActivityType.TASK_UPDATED,
+    type: ActivityType.LABEL_ASSIGNED,
     message: `Added label "${label.name}" to task "${updatedTask.title}"`,
     userId,
     projectId: updatedTask.projectId,
@@ -110,7 +111,7 @@ export async function removeLabel(
   });
 
   await createActivity(prisma, {
-    type: ActivityType.TASK_UPDATED,
+    type: ActivityType.LABEL_REMOVED,
     message: `Removed label "${label.name}" from task "${updatedTask.title}"`,
     userId,
     projectId: updatedTask.projectId,

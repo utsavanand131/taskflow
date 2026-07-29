@@ -1,5 +1,6 @@
 import { PrismaClient, TeamRole } from "@/app/generated/prisma/client";
 import { ActivityType } from "@/app/generated/prisma/enums";
+
 import { createActivity } from "./activity";
 
 interface CreateTeamInput {
@@ -115,7 +116,7 @@ export async function updateTeam(
     return null;
   }
 
-  return prisma.team.update({
+  const updatedTeam = await prisma.team.update({
     where: {
       id: teamId,
     },
@@ -130,6 +131,15 @@ export async function updateTeam(
       },
     },
   });
+
+  await createActivity(prisma, {
+    type: ActivityType.TEAM_UPDATED,
+    message: `Updated team "${updatedTeam.name}"`,
+    userId,
+    teamId: updatedTeam.id,
+  });
+
+  return updatedTeam;
 }
 
 export async function deleteTeam(
@@ -152,6 +162,13 @@ export async function deleteTeam(
   if (!team) {
     return false;
   }
+
+  await createActivity(prisma, {
+    type: ActivityType.TEAM_DELETED,
+    message: `Deleted team "${team.name}"`,
+    userId,
+    teamId: team.id,
+  });
 
   await prisma.team.delete({
     where: {

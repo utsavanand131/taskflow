@@ -1,5 +1,6 @@
 import { PrismaClient } from "@/app/generated/prisma/client";
 import { ActivityType } from "@/app/generated/prisma/enums";
+
 import { createActivity } from "./activity";
 
 interface CreateProjectInput {
@@ -98,7 +99,6 @@ export async function searchProjects(
 ) {
   const where = {
     ...getProjectAccessWhere(ownerId),
-
     ...(search && {
       name: {
         contains: search,
@@ -112,16 +112,13 @@ export async function searchProjects(
 
   const items = await prisma.project.findMany({
     where,
-
     include: {
       owner: true,
       team: true,
     },
-
     orderBy: {
       createdAt: "desc",
     },
-
     skip: (page - 1) * limit,
     take: limit,
   });

@@ -1,5 +1,6 @@
 import { PrismaClient } from "@/app/generated/prisma/client";
 import { ActivityType } from "@/app/generated/prisma/enums";
+
 import { createActivity } from "./activity";
 import { UploadAttachmentInput } from "./taskTypes";
 import { getTaskAccessWhere } from "./taskUtils";
@@ -35,7 +36,7 @@ export async function uploadAttachment(
   });
 
   await createActivity(prisma, {
-    type: ActivityType.TASK_UPDATED,
+    type: ActivityType.ATTACHMENT_UPLOADED,
     message: `Uploaded "${attachment.fileName}" to task "${task.title}"`,
     userId,
     projectId: task.projectId,
@@ -67,7 +68,7 @@ export async function deleteAttachment(
   }
 
   await createActivity(prisma, {
-    type: ActivityType.TASK_UPDATED,
+    type: ActivityType.ATTACHMENT_DELETED,
     message: `Deleted attachment "${attachment.fileName}" from task "${attachment.task.title}"`,
     userId,
     projectId: attachment.task.projectId,
