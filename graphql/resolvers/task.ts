@@ -1,21 +1,25 @@
 import { requireAuth } from "@/lib/require-auth";
 import {
-  addComment,
-  assignLabel,
   assignTask,
-  createLabel,
   createTask,
-  deleteAttachment,
-  deleteComment,
   deleteTask,
   getTaskById,
-  getTasks,
-  removeLabel,
-  searchTasks,
-  updateComment,
   updateTask,
-  uploadAttachment,
 } from "@/services/task";
+import { getTasks, searchTasks } from "@/services/taskSearch";
+import {
+  addComment,
+  updateComment,
+  deleteComment,
+} from "@/services/taskComments";
+import { createLabel, assignLabel, removeLabel } from "@/services/taskLabels";
+import { uploadAttachment, deleteAttachment } from "@/services/taskAttachments";
+import {
+  addChecklistItem,
+  updateChecklistItem,
+  toggleChecklistItem,
+  deleteChecklistItem,
+} from "@/services/taskChecklist";
 
 export const taskResolvers = {
   Query: {
@@ -300,6 +304,108 @@ export const taskResolvers = {
 
       if (!deleted) {
         throw new Error("Attachment not found.");
+      }
+
+      return true;
+    },
+
+    addChecklistItem: async (
+      _: unknown,
+      {
+        taskId,
+        content,
+      }: {
+        taskId: string;
+        content: string;
+      },
+      context: any,
+    ) => {
+      const user = requireAuth(context);
+
+      const item = await addChecklistItem(
+        context.prisma,
+        user.id,
+        taskId,
+        content,
+      );
+
+      if (!item) {
+        throw new Error("Task not found.");
+      }
+
+      return item;
+    },
+
+    updateChecklistItem: async (
+      _: unknown,
+      {
+        checklistItemId,
+        content,
+      }: {
+        checklistItemId: string;
+        content: string;
+      },
+      context: any,
+    ) => {
+      const user = requireAuth(context);
+
+      const item = await updateChecklistItem(
+        context.prisma,
+        user.id,
+        checklistItemId,
+        content,
+      );
+
+      if (!item) {
+        throw new Error("Checklist item not found.");
+      }
+
+      return item;
+    },
+
+    toggleChecklistItem: async (
+      _: unknown,
+      {
+        checklistItemId,
+      }: {
+        checklistItemId: string;
+      },
+      context: any,
+    ) => {
+      const user = requireAuth(context);
+
+      const item = await toggleChecklistItem(
+        context.prisma,
+        user.id,
+        checklistItemId,
+      );
+
+      if (!item) {
+        throw new Error("Checklist item not found.");
+      }
+
+      return item;
+    },
+
+    deleteChecklistItem: async (
+      _: unknown,
+      {
+        checklistItemId,
+      }: {
+        checklistItemId: string;
+      },
+      context: any,
+    ) => {
+      const user = requireAuth(context);
+
+      const deleted = await deleteChecklistItem(
+        context.prisma,
+        user.id,
+        checklistItemId,
+      );
+
+      if (!deleted) {
+        throw new Error("Checklist item not found.");
       }
 
       return true;

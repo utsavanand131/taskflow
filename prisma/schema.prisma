@@ -65,6 +65,7 @@ model User {
   activities      Activity[]
   comments        Comment[]
   attachments     Attachment[]
+  checklistItems  ChecklistItem[]
 
   @@index([email])
 }
@@ -114,6 +115,7 @@ model Task {
   comments    Comment[]
   labels      Label[]
   attachments Attachment[]
+  checklist   ChecklistItem[]
 
   @@index([projectId])
   @@index([assigneeId])
@@ -197,7 +199,6 @@ model Activity {
   @@index([teamId])
   @@index([createdAt])
 }
-
 model Comment {
   id      String @id @default(cuid())
   content String
@@ -205,7 +206,8 @@ model Comment {
   taskId   String
   authorId String
 
-  task   Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
@@ -216,8 +218,8 @@ model Comment {
 }
 
 model Label {
-  id    String  @id @default(cuid())
-  name  String  @unique
+  id    String @id @default(cuid())
+  name  String @unique
   color String?
 
   tasks Task[]
@@ -247,4 +249,26 @@ model Attachment {
 
   @@index([taskId])
   @@index([uploadedById])
+}
+
+model ChecklistItem {
+  id String @id @default(cuid())
+
+  content String
+
+  completed Boolean @default(false)
+
+  taskId String
+
+  createdById String
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  createdBy User @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([taskId])
+  @@index([createdById])
 }

@@ -39,6 +39,15 @@ export const taskTypeDefs = gql`
     createdAt: String!
   }
 
+  type ChecklistItem {
+    id: ID!
+    content: String!
+    completed: Boolean!
+    createdBy: User!
+    createdAt: String!
+    updatedAt: String!
+  }
+
   type Task {
     id: ID!
     title: String!
@@ -51,6 +60,7 @@ export const taskTypeDefs = gql`
     comments: [Comment!]!
     labels: [Label!]!
     attachments: [Attachment!]!
+    checklist: [ChecklistItem!]!
     createdAt: String!
     updatedAt: String!
   }
@@ -120,6 +130,14 @@ export const taskTypeDefs = gql`
     ): Attachment!
 
     deleteAttachment(attachmentId: ID!): Boolean!
+
+    addChecklistItem(taskId: ID!, content: String!): ChecklistItem!
+
+    updateChecklistItem(checklistItemId: ID!, content: String!): ChecklistItem!
+
+    toggleChecklistItem(checklistItemId: ID!): ChecklistItem!
+
+    deleteChecklistItem(checklistItemId: ID!): Boolean!
 
     deleteTask(id: ID!): Boolean!
   }
