@@ -158,7 +158,23 @@ export async function updateProject(
   const project = await prisma.project.findFirst({
     where: {
       id: projectId,
-      ...getProjectAccessWhere(ownerId),
+      OR: [
+        {
+          ownerId: ownerId,
+        },
+        {
+          team: {
+            members: {
+              some: {
+                userId: ownerId,
+                role: {
+                  in: ["OWNER", "ADMIN"],
+                },
+              },
+            },
+          },
+        },
+      ],
     },
   });
 
@@ -197,7 +213,11 @@ export async function deleteProject(
   const project = await prisma.project.findFirst({
     where: {
       id: projectId,
-      ...getProjectAccessWhere(ownerId),
+      OR: [
+        {
+          ownerId: ownerId,
+        },
+      ],
     },
   });
 

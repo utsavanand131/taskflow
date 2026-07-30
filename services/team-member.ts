@@ -45,10 +45,13 @@ export async function removeTeamMember(
     },
   });
 
-  if (!currentMember || currentMember.role !== TeamRole.OWNER) {
-    throw new Error("Only the team owner can remove members.");
+  if (
+    !currentMember ||
+    (currentMember.role !== TeamRole.OWNER &&
+      currentMember.role !== TeamRole.ADMIN)
+  ) {
+    throw new Error("Only owners and admins can remove members.");
   }
-
   const targetMember = await prisma.teamMember.findFirst({
     where: {
       teamId,

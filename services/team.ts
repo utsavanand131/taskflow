@@ -100,19 +100,21 @@ export async function updateTeam(
   teamId: string,
   input: UpdateTeamInput,
 ) {
-  const team = await prisma.team.findFirst({
+  const membership = await prisma.teamMember.findFirst({
     where: {
-      id: teamId,
-      members: {
-        some: {
-          userId,
-          role: TeamRole.OWNER,
-        },
-      },
+      teamId,
+      userId,
     },
   });
 
-  if (!team) {
+  if (!membership) {
+    return null;
+  }
+
+  if (
+    membership.role !== TeamRole.OWNER &&
+    membership.role !== TeamRole.ADMIN
+  ) {
     return null;
   }
 

@@ -1,4 +1,5 @@
-import { PrismaClient } from "@/app/generated/prisma/client";
+import { PrismaClient, TeamRole } from "@/app/generated/prisma/client";
+
 import { ActivityType } from "@/app/generated/prisma/enums";
 
 import { createActivity } from "./activity";
@@ -116,6 +117,7 @@ export async function assignTask(
     include: {
       project: {
         include: {
+          owner: true,
           team: {
             include: {
               members: true,
@@ -130,20 +132,38 @@ export async function assignTask(
     return null;
   }
 
+  const currentMembership = await prisma.teamMember.findFirst({
+    where: {
+      teamId: task.project.teamId ?? "",
+      userId,
+    },
+  });
+
+  const isOwner = task.project.ownerId === userId;
+
+  const canAssign =
+    isOwner ||
+    currentMembership?.role === TeamRole.OWNER ||
+    currentMembership?.role === TeamRole.ADMIN;
+
+  if (!canAssign) {
+    throw new Error("Only owners and admins can assign tasks.");
+  }
+
   if (assigneeId) {
-    let canAssign = false;
+    let userExists = false;
 
     if (task.project.ownerId === assigneeId) {
-      canAssign = true;
+      userExists = true;
     }
 
     if (
       task.project.team?.members.some((member) => member.userId === assigneeId)
     ) {
-      canAssign = true;
+      userExists = true;
     }
 
-    if (!canAssign) {
+    if (!userExists) {
       throw new Error("User is not a member of this project.");
     }
   }
@@ -179,7 +199,25 @@ export async function deleteTask(
   const task = await prisma.task.findFirst({
     where: {
       id: taskId,
-      project: getTaskAccessWhere(userId),
+      project: {
+        OR: [
+          {
+            ownerId: userId,
+          },
+          {
+            team: {
+              members: {
+                some: {
+                  userId,
+                  role: {
+                    in: [TeamRole.OWNER, TeamRole.ADMIN],
+                  },
+                },
+              },
+            },
+          },
+        ],
+      },
     },
   });
 
