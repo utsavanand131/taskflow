@@ -56,11 +56,27 @@ export const taskResolvers = {
       {
         projectId,
         search,
+        filter,
+        sort,
         page,
         limit,
       }: {
         projectId: string;
         search?: string;
+
+        filter?: {
+          status?: TaskStatus;
+          priority?: TaskPriority;
+          assigneeId?: string;
+          dueBefore?: string;
+          dueAfter?: string;
+        };
+
+        sort?: {
+          field: string;
+          order?: "ASC" | "DESC";
+        };
+
         page?: number;
         limit?: number;
       },
@@ -75,6 +91,8 @@ export const taskResolvers = {
         search ?? "",
         page ?? 1,
         limit ?? 10,
+        filter,
+        sort,
       );
     },
 

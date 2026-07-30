@@ -127,6 +127,8 @@ export const taskTypeDefs = gql`
     searchTasks(
       projectId: ID!
       search: String
+      filter: TaskFilterInput
+      sort: TaskSortInput
       page: Int = 1
       limit: Int = 10
     ): TaskPage!

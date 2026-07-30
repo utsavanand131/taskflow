@@ -44,7 +44,6 @@ export async function getTasks(
     orderBy: buildTaskSort(sort),
   });
 }
-
 export async function searchTasks(
   prisma: PrismaClient,
   userId: string,
@@ -52,6 +51,17 @@ export async function searchTasks(
   search: string,
   page: number,
   limit: number,
+  filter?: {
+    status?: TaskStatus;
+    priority?: TaskPriority;
+    assigneeId?: string;
+    dueBefore?: string;
+    dueAfter?: string;
+  },
+  sort?: {
+    field: string;
+    order?: "ASC" | "DESC";
+  },
 ) {
   const project = await prisma.project.findFirst({
     where: {
@@ -71,6 +81,9 @@ export async function searchTasks(
 
   const where = {
     projectId,
+
+    ...buildTaskFilter(filter),
+
     ...(search && {
       title: {
         contains: search,
@@ -85,9 +98,7 @@ export async function searchTasks(
   const items = await prisma.task.findMany({
     where,
     include: taskInclude,
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy: buildTaskSort(sort),
     skip: (page - 1) * limit,
     take: limit,
   });
