@@ -20,17 +20,35 @@ import {
   toggleChecklistItem,
   deleteChecklistItem,
 } from "@/services/taskChecklist";
+import { TaskPriority, TaskStatus } from "@/app/generated/prisma/enums";
 
 export const taskResolvers = {
   Query: {
     tasks: async (
       _: unknown,
-      { projectId }: { projectId: string },
+      {
+        projectId,
+        filter,
+        sort,
+      }: {
+        projectId: string;
+        filter?: {
+          status?: TaskStatus;
+          priority?: TaskPriority;
+          assigneeId?: string;
+          dueBefore?: string;
+          dueAfter?: string;
+        };
+        sort?: {
+          field: string;
+          order?: "ASC" | "DESC";
+        };
+      },
       context: any,
     ) => {
       const user = requireAuth(context);
 
-      return getTasks(context.prisma, user.id, projectId);
+      return getTasks(context.prisma, user.id, projectId, filter, sort);
     },
 
     searchTasks: async (

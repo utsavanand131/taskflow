@@ -1,10 +1,28 @@
-import { PrismaClient } from "@/app/generated/prisma/client";
+import {
+  PrismaClient,
+  TaskPriority,
+  TaskStatus,
+} from "@/app/generated/prisma/client";
+
 import { getTaskAccessWhere, taskInclude } from "./taskUtils";
+import { buildTaskFilter } from "./taskFilters";
+import { buildTaskSort } from "./taskSorting";
 
 export async function getTasks(
   prisma: PrismaClient,
   userId: string,
   projectId: string,
+  filter?: {
+    status?: TaskStatus;
+    priority?: TaskPriority;
+    assigneeId?: string;
+    dueBefore?: string;
+    dueAfter?: string;
+  },
+  sort?: {
+    field: string;
+    order?: "ASC" | "DESC";
+  },
 ) {
   const project = await prisma.project.findFirst({
     where: {
@@ -20,11 +38,10 @@ export async function getTasks(
   return prisma.task.findMany({
     where: {
       projectId,
+      ...buildTaskFilter(filter),
     },
     include: taskInclude,
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy: buildTaskSort(sort),
   });
 }
 

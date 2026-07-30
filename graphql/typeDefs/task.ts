@@ -14,6 +14,19 @@ export const taskTypeDefs = gql`
     URGENT
   }
 
+  enum TaskSortField {
+    CREATED_AT
+    UPDATED_AT
+    DUE_DATE
+    PRIORITY
+    TITLE
+  }
+
+  enum SortOrder {
+    ASC
+    DESC
+  }
+
   type Comment {
     id: ID!
     content: String!
@@ -72,6 +85,19 @@ export const taskTypeDefs = gql`
     totalPages: Int!
   }
 
+  input TaskFilterInput {
+    status: TaskStatus
+    priority: TaskPriority
+    assigneeId: ID
+    dueBefore: String
+    dueAfter: String
+  }
+
+  input TaskSortInput {
+    field: TaskSortField!
+    order: SortOrder = DESC
+  }
+
   input CreateTaskInput {
     projectId: ID!
     title: String!
@@ -90,7 +116,11 @@ export const taskTypeDefs = gql`
   }
 
   extend type Query {
-    tasks(projectId: ID!): [Task!]!
+    tasks(
+      projectId: ID!
+      filter: TaskFilterInput
+      sort: TaskSortInput
+    ): [Task!]!
 
     task(id: ID!): Task
 
