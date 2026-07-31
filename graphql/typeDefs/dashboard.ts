@@ -18,9 +18,28 @@ export const dashboardTypeDefs = gql`
     completionRate: Float!
   }
 
+  type PriorityDistribution {
+    LOW: Int!
+    MEDIUM: Int!
+    HIGH: Int!
+    URGENT: Int!
+  }
+
+  type ProjectProgress {
+    id: ID!
+    name: String!
+    completionRate: Float!
+  }
+
+  type DashboardAnalytics {
+    priorityDistribution: PriorityDistribution!
+    projectProgress: [ProjectProgress!]!
+  }
+
   type DashboardStats {
     projects: ProjectStats!
     tasks: TaskStats!
+    analytics: DashboardAnalytics!
     recentActivity: [Activity!]!
   }
 

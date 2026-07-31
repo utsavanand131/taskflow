@@ -52,6 +52,9 @@ export async function getDashboardStats(prisma: PrismaClient, userId: string) {
     overdueTasks,
     dueTodayTasks,
 
+    priorityStats,
+    projectProgress,
+
     recentActivity,
   ] = await Promise.all([
     prisma.project.count({
@@ -126,6 +129,25 @@ export async function getDashboardStats(prisma: PrismaClient, userId: string) {
       },
     }),
 
+    prisma.task.groupBy({
+      by: ["priority"],
+      where: taskWhere,
+      _count: {
+        id: true,
+      },
+    }),
+
+    prisma.project.findMany({
+      where: projectWhere,
+      include: {
+        tasks: {
+          select: {
+            status: true,
+          },
+        },
+      },
+    }),
+
     prisma.activity.findMany({
       where: {
         userId,
@@ -141,6 +163,32 @@ export async function getDashboardStats(prisma: PrismaClient, userId: string) {
     totalTasks === 0
       ? 0
       : Number(((completedTasks / totalTasks) * 100).toFixed(1));
+
+  const priorityDistribution = {
+    LOW: 0,
+    MEDIUM: 0,
+    HIGH: 0,
+    URGENT: 0,
+  };
+
+  priorityStats.forEach((item) => {
+    priorityDistribution[item.priority] = item._count.id;
+  });
+
+  const projectAnalytics = projectProgress.map((project) => {
+    const total = project.tasks.length;
+
+    const completed = project.tasks.filter(
+      (task) => task.status === TaskStatus.DONE,
+    ).length;
+
+    return {
+      id: project.id,
+      name: project.name,
+      completionRate:
+        total === 0 ? 0 : Number(((completed / total) * 100).toFixed(1)),
+    };
+  });
 
   return {
     projects: {
@@ -158,6 +206,11 @@ export async function getDashboardStats(prisma: PrismaClient, userId: string) {
       overdue: overdueTasks,
       dueToday: dueTodayTasks,
       completionRate,
+    },
+
+    analytics: {
+      priorityDistribution,
+      projectProgress: projectAnalytics,
     },
 
     recentActivity,
