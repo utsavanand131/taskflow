@@ -6,6 +6,7 @@ import { invitationResolvers } from "./invitation";
 import { teamMemberResolvers } from "./team-member";
 import { dashboardResolvers } from "./dashboard";
 import { notificationResolvers } from "./notification";
+import { taskReminderResolvers } from "./taskReminder";
 
 export const resolvers = {
   Query: {
@@ -18,6 +19,7 @@ export const resolvers = {
     ...teamMemberResolvers.Query,
     ...dashboardResolvers.Query,
     ...notificationResolvers.Query,
+    ...taskReminderResolvers.Query,
   },
 
   Mutation: {

@@ -9,6 +9,7 @@ import { invitationTypeDefs } from "./invitation";
 import { dashboardTypeDefs } from "./dashboard";
 import { activityTypeDefs } from "./activity";
 import { notificationTypeDefs } from "./notification";
+import { taskReminderTypeDefs } from "./taskReminder";
 
 const baseTypeDefs = gql`
   type Query {
@@ -31,4 +32,5 @@ export const typeDefs = [
   activityTypeDefs,
   dashboardTypeDefs,
   notificationTypeDefs,
+  taskReminderTypeDefs,
 ];
