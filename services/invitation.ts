@@ -5,6 +5,7 @@ import {
 } from "@/app/generated/prisma/client";
 import { ActivityType } from "@/app/generated/prisma/enums";
 import { createActivity } from "./activity";
+import { createNotification } from "./notification";
 
 export async function inviteMember(
   prisma: PrismaClient,
@@ -69,6 +70,19 @@ export async function inviteMember(
     userId,
     teamId,
   });
+  const invitedUser = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  if (invitedUser) {
+    await createNotification(
+      prisma,
+      invitedUser.id,
+      `You were invited to team "${invitation.team.name}"`,
+    );
+  }
 
   return invitation;
 }

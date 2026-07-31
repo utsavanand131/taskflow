@@ -8,6 +8,7 @@ import { commentTypeDefs } from "./comment";
 import { invitationTypeDefs } from "./invitation";
 import { dashboardTypeDefs } from "./dashboard";
 import { activityTypeDefs } from "./activity";
+import { notificationTypeDefs } from "./notification";
 
 const baseTypeDefs = gql`
   type Query {
@@ -29,4 +30,5 @@ export const typeDefs = [
   invitationTypeDefs,
   activityTypeDefs,
   dashboardTypeDefs,
+  notificationTypeDefs,
 ];

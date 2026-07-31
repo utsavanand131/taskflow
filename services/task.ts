@@ -1,12 +1,10 @@
 import { PrismaClient, TeamRole } from "@/app/generated/prisma/client";
 
 import { ActivityType } from "@/app/generated/prisma/enums";
-
 import { createActivity } from "./activity";
-
 import { CreateTaskInput, UpdateTaskInput } from "./taskTypes";
-
 import { getTaskAccessWhere, taskInclude } from "./taskUtils";
+import { createNotification } from "./notification";
 
 export async function createTask(
   prisma: PrismaClient,
@@ -187,6 +185,13 @@ export async function assignTask(
     projectId: updatedTask.projectId,
     taskId: updatedTask.id,
   });
+  if (assigneeId) {
+    await createNotification(
+      prisma,
+      assigneeId,
+      `You were assigned task "${updatedTask.title}"`,
+    );
+  }
 
   return updatedTask;
 }
