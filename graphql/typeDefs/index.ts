@@ -10,6 +10,7 @@ import { dashboardTypeDefs } from "./dashboard";
 import { activityTypeDefs } from "./activity";
 import { notificationTypeDefs } from "./notification";
 import { taskReminderTypeDefs } from "./taskReminder";
+import { oauthTypeDefs } from "./oauth";
 
 const baseTypeDefs = gql`
   type Query {
@@ -33,4 +34,5 @@ export const typeDefs = [
   dashboardTypeDefs,
   notificationTypeDefs,
   taskReminderTypeDefs,
+  oauthTypeDefs,
 ];
