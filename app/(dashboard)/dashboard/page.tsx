@@ -11,6 +11,8 @@ import {
 
 import StatsCard from "@/components/dashboard/StatsCard";
 import ActivityFeed from "@/components/dashboard/ActivityFeed";
+import PriorityChart from "@/components/charts/PriorityChart";
+import ProjectProgressChart from "@/components/charts/ProjectProgressChart";
 
 const DASHBOARD_QUERY = gql`
   query DashboardStats {
@@ -29,6 +31,21 @@ const DASHBOARD_QUERY = gql`
         completionRate
       }
 
+      analytics {
+        priorityDistribution {
+          LOW
+          MEDIUM
+          HIGH
+          URGENT
+        }
+
+        projectProgress {
+          id
+          name
+          completionRate
+        }
+      }
+
       recentActivity {
         id
         type
@@ -38,7 +55,6 @@ const DASHBOARD_QUERY = gql`
     }
   }
 `;
-
 interface DashboardResponse {
   dashboardStats: {
     projects: {
@@ -61,6 +77,21 @@ interface DashboardResponse {
       message: string;
       createdAt: string;
     }[];
+
+    analytics: {
+      priorityDistribution: {
+        LOW: number;
+        MEDIUM: number;
+        HIGH: number;
+        URGENT: number;
+      };
+
+      projectProgress: {
+        id: string;
+        name: string;
+        completionRate: number;
+      }[];
+    };
   };
 }
 
@@ -115,6 +146,11 @@ export default function DashboardPage() {
           value={stats.tasks.overdue}
           icon={AlertTriangle}
         />
+      </div>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <PriorityChart data={stats.analytics.priorityDistribution} />
+
+        <ProjectProgressChart data={stats.analytics.projectProgress} />
       </div>
 
       <ActivityFeed activities={stats.recentActivity} />

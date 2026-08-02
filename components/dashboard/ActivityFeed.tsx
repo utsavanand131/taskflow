@@ -20,7 +20,7 @@ export default function ActivityFeed({
             <p className="text-sm">{activity.message}</p>
 
             <p className="text-xs text-gray-500">
-              {new Date(activity.createdAt).toLocaleString()}
+              {new Date(Number(activity.createdAt)).toLocaleString()}
             </p>
           </div>
         ))}
