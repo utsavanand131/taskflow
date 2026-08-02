@@ -2,7 +2,8 @@
 
 import { Bell, LogOut, Menu } from "lucide-react";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+
 import { removeToken } from "@/lib/auth/client";
 
 interface NavbarProps {
@@ -11,6 +12,13 @@ interface NavbarProps {
 
 export default function Navbar({ setMobileOpen }: NavbarProps) {
   const router = useRouter();
+  const pathname = usePathname();
+
+  const pageTitle =
+    pathname
+      .split("/")[1]
+      ?.replace("-", " ")
+      .replace(/\b\w/g, (char) => char.toUpperCase()) || "Dashboard";
 
   function handleLogout() {
     removeToken();
@@ -24,7 +32,7 @@ export default function Navbar({ setMobileOpen }: NavbarProps) {
           <Menu size={24} />
         </button>
 
-        <h2 className="text-lg font-semibold">Dashboard</h2>
+        <h2 className="text-lg font-semibold">{pageTitle}</h2>
       </div>
 
       <div className="flex items-center gap-2 md:gap-4">
