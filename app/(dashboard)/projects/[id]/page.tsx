@@ -1,11 +1,13 @@
 "use client";
 
 import { gql } from "@apollo/client";
-import { useQuery } from "@apollo/client/react";
+import { useQuery, useMutation } from "@apollo/client/react";
+import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { useParams } from "next/navigation";
 
 import TaskCard from "@/components/tasks/TaskCard";
 import CreateTaskDialog from "@/components/tasks/CreateTaskDialog";
+import KanbanColumn from "@/components/tasks/KanbanColumn";
 
 const PROJECT_QUERY = gql`
   query Project($id: ID!) {
@@ -31,6 +33,15 @@ const PROJECT_QUERY = gql`
       priority
       dueDate
       createdAt
+    }
+  }
+`;
+
+const UPDATE_TASK_MUTATION = gql`
+  mutation UpdateTask($id: ID!, $input: UpdateTaskInput!) {
+    updateTask(id: $id, input: $input) {
+      id
+      status
     }
   }
 `;
@@ -74,6 +85,40 @@ export default function ProjectDetailsPage() {
       },
     },
   );
+
+  const [updateTask] = useMutation(UPDATE_TASK_MUTATION);
+
+  async function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+
+    if (!over) return;
+
+    const taskId = active.id.toString();
+
+    let newStatus = over.id.toString();
+
+    const validStatuses = ["TODO", "IN_PROGRESS", "DONE"];
+
+    // Dropped on another task
+    if (!validStatuses.includes(newStatus)) {
+      const droppedTask = data?.tasks.find((task) => task.id === newStatus);
+
+      if (!droppedTask) return;
+
+      newStatus = droppedTask.status;
+    }
+
+    await updateTask({
+      variables: {
+        id: taskId,
+        input: {
+          status: newStatus,
+        },
+      },
+    });
+
+    refetch();
+  }
 
   if (loading) {
     return <div>Loading project...</div>;
@@ -130,15 +175,27 @@ export default function ProjectDetailsPage() {
           />
         </div>
 
-        {data.tasks.length === 0 ? (
-          <p className="text-gray-500">No tasks yet.</p>
-        ) : (
-          <div className="space-y-3">
-            {data.tasks.map((task) => (
-              <TaskCard key={task.id} task={task} />
-            ))}
+        <DndContext onDragEnd={handleDragEnd}>
+          <div className="grid gap-4 lg:grid-cols-3">
+            <KanbanColumn
+              id="TODO"
+              title="TODO"
+              tasks={data.tasks.filter((task) => task.status === "TODO")}
+            />
+
+            <KanbanColumn
+              id="IN_PROGRESS"
+              title="IN_PROGRESS"
+              tasks={data.tasks.filter((task) => task.status === "IN_PROGRESS")}
+            />
+
+            <KanbanColumn
+              id="DONE"
+              title="DONE"
+              tasks={data.tasks.filter((task) => task.status === "DONE")}
+            />
           </div>
-        )}
+        </DndContext>
       </div>
     </div>
   );
