@@ -15,7 +15,16 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   return (
     <div className="rounded-xl border p-5 space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">{project.name}</h2>
+        <div className="flex items-center gap-3">
+          <div
+            className="h-4 w-4 rounded-full"
+            style={{
+              backgroundColor: project.color || "#6366f1",
+            }}
+          />
+
+          <h2 className="text-lg font-semibold">{project.name}</h2>
+        </div>
 
         <span className="rounded-full border px-3 py-1 text-xs">
           {project.status}

@@ -3,6 +3,7 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import ProjectCard from "@/components/projects/ProjectCard";
+import CreateProjectDialog from "@/components/projects/CreateProjectDialog";
 
 const PROJECTS_QUERY = gql`
   query Projects {
@@ -29,7 +30,8 @@ interface ProjectsResponse {
 }
 
 export default function ProjectsPage() {
-  const { data, loading, error } = useQuery<ProjectsResponse>(PROJECTS_QUERY);
+  const { data, loading, error, refetch } =
+    useQuery<ProjectsResponse>(PROJECTS_QUERY);
 
   if (loading) {
     return <div>Loading projects...</div>;
@@ -43,6 +45,7 @@ export default function ProjectsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <p className="text-gray-500">Manage your workspace projects</p>
+        <CreateProjectDialog onCreated={() => refetch()} />
       </div>
 
       {data?.projects.length === 0 ? (
