@@ -7,6 +7,8 @@ import TaskCard from "./TaskCard";
 interface KanbanColumnProps {
   id: string;
   title: string;
+  projectId: string;
+
   tasks: {
     id: string;
     title: string;
@@ -15,7 +17,12 @@ interface KanbanColumnProps {
   }[];
 }
 
-export default function KanbanColumn({ id, title, tasks }: KanbanColumnProps) {
+export default function KanbanColumn({
+  id,
+  title,
+  projectId,
+  tasks,
+}: KanbanColumnProps) {
   const { setNodeRef } = useDroppable({
     id,
   });
@@ -32,7 +39,7 @@ export default function KanbanColumn({ id, title, tasks }: KanbanColumnProps) {
 
       <div className="space-y-3">
         {tasks.map((task) => (
-          <TaskCard key={task.id} task={task} />
+          <TaskCard key={task.id} projectId={projectId} task={task} />
         ))}
       </div>
     </div>

@@ -180,18 +180,21 @@ export default function ProjectDetailsPage() {
             <KanbanColumn
               id="TODO"
               title="TODO"
+              projectId={project.id}
               tasks={data.tasks.filter((task) => task.status === "TODO")}
             />
 
             <KanbanColumn
               id="IN_PROGRESS"
               title="IN_PROGRESS"
+              projectId={project.id}
               tasks={data.tasks.filter((task) => task.status === "IN_PROGRESS")}
             />
 
             <KanbanColumn
               id="DONE"
               title="DONE"
+              projectId={project.id}
               tasks={data.tasks.filter((task) => task.status === "DONE")}
             />
           </div>

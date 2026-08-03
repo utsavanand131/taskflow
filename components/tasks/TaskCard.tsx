@@ -1,9 +1,10 @@
 "use client";
 
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { useRouter } from "next/navigation";
 
 interface TaskCardProps {
+  projectId: string;
+
   task: {
     id: string;
     title: string;
@@ -12,24 +13,17 @@ interface TaskCardProps {
   };
 }
 
-export default function TaskCard({ task }: TaskCardProps) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({
-      id: task.id,
-    });
+export default function TaskCard({ projectId, task }: TaskCardProps) {
+  const router = useRouter();
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
+  function handleClick() {
+    router.push(`/projects/${projectId}/tasks/${task.id}`);
+  }
 
   return (
     <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className="cursor-grab rounded-xl border p-4 space-y-3 transition hover:border-primary"
+      onClick={handleClick}
+      className="cursor-pointer rounded-xl border p-4 space-y-3 transition hover:border-primary"
     >
       <h3 className="font-semibold">{task.title}</h3>
 
