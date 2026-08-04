@@ -42,4 +42,8 @@ export const activityTypeDefs = gql`
 
     createdAt: String!
   }
+
+  extend type Query {
+    taskActivities(taskId: ID!): [Activity!]!
+  }
 `;

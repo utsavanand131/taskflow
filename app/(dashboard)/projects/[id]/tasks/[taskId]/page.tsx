@@ -4,6 +4,8 @@ import { gql } from "@apollo/client";
 import { useQuery, useMutation } from "@apollo/client/react";
 import { useParams } from "next/navigation";
 
+import ActivityTimeline from "@/components/tasks/ActivityTimeline";
+
 const TASK_QUERY = gql`
   query Task($id: ID!) {
     task(id: $id) {
@@ -17,6 +19,17 @@ const TASK_QUERY = gql`
 
       project {
         id
+        name
+      }
+    }
+
+    activities: taskActivities(taskId: $id) {
+      id
+      type
+      message
+      createdAt
+
+      user {
         name
       }
     }
@@ -48,6 +61,17 @@ interface TaskResponse {
       name: string;
     };
   };
+
+  activities: {
+    id: string;
+    type: string;
+    message: string;
+    createdAt: string;
+
+    user?: {
+      name: string;
+    } | null;
+  }[];
 }
 
 export default function TaskDetailsPage() {
@@ -156,6 +180,8 @@ export default function TaskDetailsPage() {
           </p>
         </div>
       </div>
+
+      <ActivityTimeline activities={data.activities} />
     </div>
   );
 }

@@ -90,14 +90,25 @@ export async function updateTask(
     include: taskInclude,
   });
 
-  await createActivity(prisma, {
-    type: ActivityType.TASK_UPDATED,
-    message: `Updated task "${updatedTask.title}"`,
-    userId,
-    projectId: updatedTask.projectId,
-    taskId: updatedTask.id,
-  });
+  if (input.status && input.status !== task.status) {
+    await createActivity(prisma, {
+      type: ActivityType.TASK_UPDATED,
+      message: `Changed status of "${updatedTask.title}" from ${task.status} to ${updatedTask.status}`,
+      userId,
+      projectId: updatedTask.projectId,
+      taskId: updatedTask.id,
+    });
+  }
 
+  if (input.priority && input.priority !== task.priority) {
+    await createActivity(prisma, {
+      type: ActivityType.TASK_UPDATED,
+      message: `Changed priority of "${updatedTask.title}" from ${task.priority} to ${updatedTask.priority}`,
+      userId,
+      projectId: updatedTask.projectId,
+      taskId: updatedTask.id,
+    });
+  }
   return updatedTask;
 }
 

@@ -8,10 +8,12 @@ import { dashboardResolvers } from "./dashboard";
 import { notificationResolvers } from "./notification";
 import { taskReminderResolvers } from "./taskReminder";
 import { oauthResolvers } from "./oauth";
+import { activityResolvers } from "./activity";
 
 export const resolvers = {
   Query: {
     health: () => "TaskFlow GraphQL API is running ",
+
     ...userResolvers.Query,
     ...projectResolvers.Query,
     ...taskResolvers.Query,
@@ -21,6 +23,7 @@ export const resolvers = {
     ...dashboardResolvers.Query,
     ...notificationResolvers.Query,
     ...taskReminderResolvers.Query,
+    ...activityResolvers.Query,
   },
 
   Mutation: {
