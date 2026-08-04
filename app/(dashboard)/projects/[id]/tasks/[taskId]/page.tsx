@@ -1,7 +1,7 @@
 "use client";
 
 import { gql } from "@apollo/client";
-import { useQuery } from "@apollo/client/react";
+import { useQuery, useMutation } from "@apollo/client/react";
 import { useParams } from "next/navigation";
 
 const TASK_QUERY = gql`
@@ -19,6 +19,16 @@ const TASK_QUERY = gql`
         id
         name
       }
+    }
+  }
+`;
+
+const UPDATE_TASK_MUTATION = gql`
+  mutation UpdateTask($id: ID!, $input: UpdateTaskInput!) {
+    updateTask(id: $id, input: $input) {
+      id
+      status
+      priority
     }
   }
 `;
@@ -45,11 +55,39 @@ export default function TaskDetailsPage() {
 
   const taskId = params.taskId as string;
 
-  const { data, loading, error } = useQuery<TaskResponse>(TASK_QUERY, {
+  const { data, loading, error, refetch } = useQuery<TaskResponse>(TASK_QUERY, {
     variables: {
       id: taskId,
     },
   });
+
+  const [updateTask] = useMutation(UPDATE_TASK_MUTATION);
+
+  async function handleStatusChange(status: string) {
+    await updateTask({
+      variables: {
+        id: taskId,
+        input: {
+          status,
+        },
+      },
+    });
+
+    refetch();
+  }
+
+  async function handlePriorityChange(priority: string) {
+    await updateTask({
+      variables: {
+        id: taskId,
+        input: {
+          priority,
+        },
+      },
+    });
+
+    refetch();
+  }
 
   if (loading) {
     return <div>Loading task...</div>;
@@ -74,12 +112,42 @@ export default function TaskDetailsPage() {
           <p className="mt-4 text-muted-foreground">{task.description}</p>
         )}
 
-        <div className="mt-6 space-y-2 text-sm">
+        <div className="mt-6 space-y-4 text-sm">
           <p>Project: {task.project.name}</p>
 
-          <p>Status: {task.status}</p>
+          <div className="flex items-center gap-3">
+            <span>Status:</span>
 
-          <p>Priority: {task.priority}</p>
+            <select
+              value={task.status}
+              onChange={(e) => handleStatusChange(e.target.value)}
+              className="rounded-md border px-3 py-1"
+            >
+              <option value="TODO">TODO</option>
+
+              <option value="IN_PROGRESS">IN_PROGRESS</option>
+
+              <option value="DONE">DONE</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span>Priority:</span>
+
+            <select
+              value={task.priority}
+              onChange={(e) => handlePriorityChange(e.target.value)}
+              className="rounded-md border px-3 py-1"
+            >
+              <option value="LOW">LOW</option>
+
+              <option value="MEDIUM">MEDIUM</option>
+
+              <option value="HIGH">HIGH</option>
+
+              <option value="URGENT">URGENT</option>
+            </select>
+          </div>
 
           {task.dueDate && <p>Due Date: {task.dueDate}</p>}
 
