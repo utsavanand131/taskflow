@@ -19,6 +19,22 @@ const ADD_COMMENT_MUTATION = gql`
   }
 `;
 
+const UPDATE_COMMENT_MUTATION = gql`
+  mutation UpdateComment($commentId: ID!, $content: String!) {
+    updateComment(commentId: $commentId, content: $content) {
+      id
+      content
+      updatedAt
+    }
+  }
+`;
+
+const DELETE_COMMENT_MUTATION = gql`
+  mutation DeleteComment($commentId: ID!) {
+    deleteComment(commentId: $commentId)
+  }
+`;
+
 interface Comment {
   id: string;
   content: string;
@@ -43,7 +59,19 @@ export default function TaskComments({
 }: TaskCommentsProps) {
   const [content, setContent] = useState("");
 
-  const [addComment, { loading }] = useMutation(ADD_COMMENT_MUTATION);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState("");
+
+  const [addComment, { loading: addingComment }] =
+    useMutation(ADD_COMMENT_MUTATION);
+
+  const [updateComment, { loading: updatingComment }] = useMutation(
+    UPDATE_COMMENT_MUTATION,
+  );
+
+  const [deleteComment, { loading: deletingComment }] = useMutation(
+    DELETE_COMMENT_MUTATION,
+  );
 
   async function handleSubmit() {
     const trimmedContent = content.trim();
@@ -60,6 +88,54 @@ export default function TaskComments({
     });
 
     setContent("");
+
+    await onCommentAdded();
+  }
+
+  function handleEdit(comment: Comment) {
+    setEditingCommentId(comment.id);
+    setEditContent(comment.content);
+  }
+
+  function handleCancelEdit() {
+    setEditingCommentId(null);
+    setEditContent("");
+  }
+
+  async function handleUpdate(commentId: string) {
+    const trimmedContent = editContent.trim();
+
+    if (!trimmedContent) {
+      return;
+    }
+
+    await updateComment({
+      variables: {
+        commentId,
+        content: trimmedContent,
+      },
+    });
+
+    setEditingCommentId(null);
+    setEditContent("");
+
+    await onCommentAdded();
+  }
+
+  async function handleDelete(commentId: string) {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this comment?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    await deleteComment({
+      variables: {
+        commentId,
+      },
+    });
 
     await onCommentAdded();
   }
@@ -82,7 +158,59 @@ export default function TaskComments({
                 </p>
               </div>
 
-              <p className="mt-2 text-sm">{comment.content}</p>
+              {editingCommentId === comment.id ? (
+                <div className="mt-3 space-y-3">
+                  <textarea
+                    value={editContent}
+                    onChange={(e) => setEditContent(e.target.value)}
+                    rows={3}
+                    className="w-full resize-none rounded-lg border p-3 text-sm outline-none"
+                  />
+
+                  <div className="flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={handleCancelEdit}
+                      disabled={updatingComment}
+                      className="rounded-lg border px-3 py-1.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Cancel
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleUpdate(comment.id)}
+                      disabled={updatingComment || !editContent.trim()}
+                      className="rounded-lg border px-3 py-1.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {updatingComment ? "Saving..." : "Save"}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <p className="mt-2 text-sm">{comment.content}</p>
+
+                  <div className="mt-3 flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => handleEdit(comment)}
+                      className="text-xs font-medium text-muted-foreground hover:text-foreground"
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(comment.id)}
+                      disabled={deletingComment}
+                      className="text-xs font-medium text-muted-foreground hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           ))
         )}
@@ -101,10 +229,10 @@ export default function TaskComments({
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={loading || !content.trim()}
+            disabled={addingComment || !content.trim()}
             className="rounded-lg border px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {loading ? "Adding..." : "Add Comment"}
+            {addingComment ? "Adding..." : "Add Comment"}
           </button>
         </div>
       </div>
