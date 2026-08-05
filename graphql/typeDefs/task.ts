@@ -123,6 +123,7 @@ export const taskTypeDefs = gql`
     ): [Task!]!
 
     task(id: ID!): Task
+    labels: [Label!]!
 
     searchTasks(
       projectId: ID!

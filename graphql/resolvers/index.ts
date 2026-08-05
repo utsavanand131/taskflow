@@ -9,6 +9,7 @@ import { notificationResolvers } from "./notification";
 import { taskReminderResolvers } from "./taskReminder";
 import { oauthResolvers } from "./oauth";
 import { activityResolvers } from "./activity";
+import { labelResolvers } from "./label";
 
 export const resolvers = {
   Query: {
@@ -24,6 +25,7 @@ export const resolvers = {
     ...notificationResolvers.Query,
     ...taskReminderResolvers.Query,
     ...activityResolvers.Query,
+    ...labelResolvers.Query,
   },
 
   Mutation: {

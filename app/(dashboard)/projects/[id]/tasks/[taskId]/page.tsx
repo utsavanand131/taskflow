@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 import ActivityTimeline from "@/components/tasks/ActivityTimeline";
 import TaskComments from "@/components/tasks/TaskComments";
 import TaskChecklist from "@/components/tasks/TaskChecklist";
+import TaskLabels from "@/components/tasks/TaskLabels";
 
 const TASK_QUERY = gql`
   query Task($id: ID!) {
@@ -22,6 +23,12 @@ const TASK_QUERY = gql`
       project {
         id
         name
+      }
+
+      labels {
+        id
+        name
+        color
       }
 
       comments {
@@ -85,6 +92,12 @@ interface TaskResponse {
       id: string;
       name: string;
     };
+
+    labels: {
+      id: string;
+      name: string;
+      color?: string | null;
+    }[];
 
     comments: {
       id: string;
@@ -223,6 +236,12 @@ export default function TaskDetailsPage() {
           </p>
         </div>
       </div>
+
+      <TaskLabels
+        taskId={task.id}
+        labels={task.labels}
+        onLabelsChanged={() => refetch()}
+      />
 
       <TaskChecklist
         taskId={task.id}
