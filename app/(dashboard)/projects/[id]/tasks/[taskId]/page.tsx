@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 
 import ActivityTimeline from "@/components/tasks/ActivityTimeline";
 import TaskComments from "@/components/tasks/TaskComments";
+import TaskChecklist from "@/components/tasks/TaskChecklist";
 
 const TASK_QUERY = gql`
   query Task($id: ID!) {
@@ -29,6 +30,18 @@ const TASK_QUERY = gql`
         createdAt
 
         author {
+          id
+          name
+        }
+      }
+
+      checklist {
+        id
+        content
+        completed
+        createdAt
+
+        createdBy {
           id
           name
         }
@@ -79,6 +92,18 @@ interface TaskResponse {
       createdAt: string;
 
       author: {
+        id: string;
+        name: string;
+      };
+    }[];
+
+    checklist: {
+      id: string;
+      content: string;
+      completed: boolean;
+      createdAt: string;
+
+      createdBy: {
         id: string;
         name: string;
       };
@@ -198,6 +223,12 @@ export default function TaskDetailsPage() {
           </p>
         </div>
       </div>
+
+      <TaskChecklist
+        taskId={task.id}
+        checklist={task.checklist}
+        onChecklistChanged={() => refetch()}
+      />
 
       <TaskComments
         taskId={task.id}
