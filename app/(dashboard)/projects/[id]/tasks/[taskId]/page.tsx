@@ -5,6 +5,7 @@ import { useQuery, useMutation } from "@apollo/client/react";
 import { useParams } from "next/navigation";
 
 import ActivityTimeline from "@/components/tasks/ActivityTimeline";
+import TaskComments from "@/components/tasks/TaskComments";
 
 const TASK_QUERY = gql`
   query Task($id: ID!) {
@@ -20,6 +21,17 @@ const TASK_QUERY = gql`
       project {
         id
         name
+      }
+
+      comments {
+        id
+        content
+        createdAt
+
+        author {
+          id
+          name
+        }
       }
     }
 
@@ -60,6 +72,17 @@ interface TaskResponse {
       id: string;
       name: string;
     };
+
+    comments: {
+      id: string;
+      content: string;
+      createdAt: string;
+
+      author: {
+        id: string;
+        name: string;
+      };
+    }[];
   };
 
   activities: {
@@ -97,7 +120,7 @@ export default function TaskDetailsPage() {
       },
     });
 
-    refetch();
+    await refetch();
   }
 
   async function handlePriorityChange(priority: string) {
@@ -110,7 +133,7 @@ export default function TaskDetailsPage() {
       },
     });
 
-    refetch();
+    await refetch();
   }
 
   if (loading) {
@@ -148,9 +171,7 @@ export default function TaskDetailsPage() {
               className="rounded-md border px-3 py-1"
             >
               <option value="TODO">TODO</option>
-
               <option value="IN_PROGRESS">IN_PROGRESS</option>
-
               <option value="DONE">DONE</option>
             </select>
           </div>
@@ -164,11 +185,8 @@ export default function TaskDetailsPage() {
               className="rounded-md border px-3 py-1"
             >
               <option value="LOW">LOW</option>
-
               <option value="MEDIUM">MEDIUM</option>
-
               <option value="HIGH">HIGH</option>
-
               <option value="URGENT">URGENT</option>
             </select>
           </div>
@@ -180,6 +198,12 @@ export default function TaskDetailsPage() {
           </p>
         </div>
       </div>
+
+      <TaskComments
+        taskId={task.id}
+        comments={task.comments}
+        onCommentAdded={() => refetch()}
+      />
 
       <ActivityTimeline activities={data.activities} />
     </div>

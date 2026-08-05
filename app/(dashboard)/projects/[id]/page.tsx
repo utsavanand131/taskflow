@@ -2,10 +2,15 @@
 
 import { gql } from "@apollo/client";
 import { useQuery, useMutation } from "@apollo/client/react";
-import { DndContext, DragEndEvent } from "@dnd-kit/core";
+import {
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import { useParams } from "next/navigation";
 
-import TaskCard from "@/components/tasks/TaskCard";
 import CreateTaskDialog from "@/components/tasks/CreateTaskDialog";
 import KanbanColumn from "@/components/tasks/KanbanColumn";
 
@@ -77,6 +82,14 @@ export default function ProjectDetailsPage() {
 
   const id = params.id as string;
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+  );
+
   const { data, loading, error, refetch } = useQuery<ProjectResponse>(
     PROJECT_QUERY,
     {
@@ -99,7 +112,6 @@ export default function ProjectDetailsPage() {
 
     const validStatuses = ["TODO", "IN_PROGRESS", "DONE"];
 
-    // Dropped on another task
     if (!validStatuses.includes(newStatus)) {
       const droppedTask = data?.tasks.find((task) => task.id === newStatus);
 
@@ -117,7 +129,7 @@ export default function ProjectDetailsPage() {
       },
     });
 
-    refetch();
+    await refetch();
   }
 
   if (loading) {
@@ -175,7 +187,7 @@ export default function ProjectDetailsPage() {
           />
         </div>
 
-        <DndContext onDragEnd={handleDragEnd}>
+        <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
           <div className="grid gap-4 lg:grid-cols-3">
             <KanbanColumn
               id="TODO"
