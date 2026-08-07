@@ -8,6 +8,7 @@ import ActivityTimeline from "@/components/tasks/ActivityTimeline";
 import TaskComments from "@/components/tasks/TaskComments";
 import TaskChecklist from "@/components/tasks/TaskChecklist";
 import TaskLabels from "@/components/tasks/TaskLabels";
+import TaskAttachments from "@/components/tasks/TaskAttachments";
 
 const TASK_QUERY = gql`
   query Task($id: ID!) {
@@ -29,6 +30,20 @@ const TASK_QUERY = gql`
         id
         name
         color
+      }
+
+      attachments {
+        id
+        fileName
+        fileUrl
+        fileSize
+        mimeType
+        createdAt
+
+        uploadedBy {
+          id
+          name
+        }
       }
 
       comments {
@@ -97,6 +112,20 @@ interface TaskResponse {
       id: string;
       name: string;
       color?: string | null;
+    }[];
+
+    attachments: {
+      id: string;
+      fileName: string;
+      fileUrl: string;
+      fileSize?: number | null;
+      mimeType?: string | null;
+      createdAt: string;
+
+      uploadedBy: {
+        id: string;
+        name: string;
+      };
     }[];
 
     comments: {
@@ -247,6 +276,12 @@ export default function TaskDetailsPage() {
         taskId={task.id}
         checklist={task.checklist}
         onChecklistChanged={() => refetch()}
+      />
+
+      <TaskAttachments
+        taskId={task.id}
+        attachments={task.attachments}
+        onAttachmentsChanged={() => refetch()}
       />
 
       <TaskComments

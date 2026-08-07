@@ -262,6 +262,8 @@ model Attachment {
 
   fileName String
   fileUrl  String
+  publicId String?
+  resourceType String?
 
   fileSize Int?
   mimeType String?

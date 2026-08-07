@@ -1,6 +1,7 @@
 import { PrismaClient } from "@/app/generated/prisma/client";
 import { ActivityType } from "@/app/generated/prisma/enums";
 
+import cloudinary from "@/lib/cloudinary";
 import { createActivity } from "./activity";
 import { UploadAttachmentInput } from "./taskTypes";
 import { getTaskAccessWhere } from "./taskUtils";
@@ -27,6 +28,8 @@ export async function uploadAttachment(
       uploadedById: userId,
       fileName: input.fileName,
       fileUrl: input.fileUrl,
+      publicId: input.publicId,
+      resourceType: input.resourceType,
       fileSize: input.fileSize,
       mimeType: input.mimeType,
     },
@@ -65,6 +68,16 @@ export async function deleteAttachment(
 
   if (!attachment) {
     return false;
+  }
+
+  if (attachment.publicId) {
+    const result = await cloudinary.uploader.destroy(attachment.publicId, {
+      resource_type: attachment.resourceType || "image",
+    });
+
+    if (result.result !== "ok" && result.result !== "not found") {
+      throw new Error("Failed to delete attachment from Cloudinary.");
+    }
   }
 
   await createActivity(prisma, {

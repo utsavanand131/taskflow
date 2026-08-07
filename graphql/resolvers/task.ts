@@ -297,12 +297,16 @@ export const taskResolvers = {
         taskId,
         fileName,
         fileUrl,
+        publicId,
+        resourceType,
         fileSize,
         mimeType,
       }: {
         taskId: string;
         fileName: string;
         fileUrl: string;
+        publicId?: string;
+        resourceType?: string;
         fileSize?: number;
         mimeType?: string;
       },
@@ -314,6 +318,8 @@ export const taskResolvers = {
         taskId,
         fileName,
         fileUrl,
+        publicId,
+        resourceType,
         fileSize,
         mimeType,
       });
@@ -324,7 +330,6 @@ export const taskResolvers = {
 
       return attachment;
     },
-
     deleteAttachment: async (
       _: unknown,
       { attachmentId }: { attachmentId: string },

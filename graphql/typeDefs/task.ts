@@ -46,6 +46,8 @@ export const taskTypeDefs = gql`
     id: ID!
     fileName: String!
     fileUrl: String!
+    publicId: String
+    resourceType: String
     fileSize: Int
     mimeType: String
     uploadedBy: User!
@@ -158,6 +160,8 @@ export const taskTypeDefs = gql`
       taskId: ID!
       fileName: String!
       fileUrl: String!
+      publicId: String
+      resourceType: String
       fileSize: Int
       mimeType: String
     ): Attachment!

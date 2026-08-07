@@ -31,6 +31,8 @@ export interface UploadAttachmentInput {
   taskId: string;
   fileName: string;
   fileUrl: string;
+  publicId?: string;
+  resourceType?: string;
   fileSize?: number;
   mimeType?: string;
 }
