@@ -85,7 +85,12 @@ export async function updateTask(
       description: input.description,
       status: input.status,
       priority: input.priority,
-      dueDate: input.dueDate ? new Date(input.dueDate) : undefined,
+      dueDate:
+        input.dueDate === undefined
+          ? undefined
+          : input.dueDate
+            ? new Date(input.dueDate)
+            : null,
     },
     include: taskInclude,
   });
@@ -109,6 +114,24 @@ export async function updateTask(
       taskId: updatedTask.id,
     });
   }
+
+  if (input.dueDate !== undefined) {
+    const oldDueDate = task.dueDate?.toISOString() ?? null;
+    const newDueDate = updatedTask.dueDate?.toISOString() ?? null;
+
+    if (oldDueDate !== newDueDate) {
+      await createActivity(prisma, {
+        type: ActivityType.TASK_UPDATED,
+        message: updatedTask.dueDate
+          ? `Changed due date of "${updatedTask.title}" to ${updatedTask.dueDate.toLocaleDateString()}`
+          : `Removed due date from "${updatedTask.title}"`,
+        userId,
+        projectId: updatedTask.projectId,
+        taskId: updatedTask.id,
+      });
+    }
+  }
+
   return updatedTask;
 }
 
@@ -196,6 +219,7 @@ export async function assignTask(
     projectId: updatedTask.projectId,
     taskId: updatedTask.id,
   });
+
   if (assigneeId) {
     await createNotification(
       prisma,

@@ -117,6 +117,7 @@ const UPDATE_TASK_MUTATION = gql`
       id
       status
       priority
+      dueDate
     }
   }
 `;
@@ -258,6 +259,19 @@ export default function TaskDetailsPage() {
     await refetch();
   }
 
+  async function handleDueDateChange(dueDate: string) {
+    await updateTask({
+      variables: {
+        id: taskId,
+        input: {
+          dueDate: dueDate || null,
+        },
+      },
+    });
+
+    await refetch();
+  }
+
   if (loading) {
     return <div>Loading task...</div>;
   }
@@ -274,8 +288,8 @@ export default function TaskDetailsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border p-6">
-        <h1 className="text-3xl font-bold">{task.title}</h1>
+      <div>
+        <h1 className="text-2xl font-semibold">{task.title}</h1>
 
         {task.description && (
           <p className="mt-4 text-muted-foreground">{task.description}</p>
@@ -321,7 +335,20 @@ export default function TaskDetailsPage() {
             </select>
           </div>
 
-          {task.dueDate && <p>Due Date: {task.dueDate}</p>}
+          <div className="flex items-center gap-3">
+            <span>Due Date:</span>
+
+            <input
+              type="date"
+              value={
+                task.dueDate
+                  ? new Date(Number(task.dueDate)).toISOString().split("T")[0]
+                  : ""
+              }
+              onChange={(e) => handleDueDateChange(e.target.value)}
+              className="rounded-md border px-3 py-1"
+            />
+          </div>
 
           <p>
             Created: {new Date(Number(task.createdAt)).toLocaleDateString()}
