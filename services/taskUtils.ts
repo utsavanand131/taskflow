@@ -20,10 +20,21 @@ export function getTaskAccessWhere(userId: string) {
 export const taskInclude = {
   project: {
     include: {
-      team: true,
+      owner: true,
+      team: {
+        include: {
+          members: {
+            include: {
+              user: true,
+            },
+          },
+        },
+      },
     },
   },
+
   assignee: true,
+
   comments: {
     include: {
       author: true,
@@ -32,11 +43,13 @@ export const taskInclude = {
       createdAt: "asc" as const,
     },
   },
+
   labels: {
     orderBy: {
       name: "asc" as const,
     },
   },
+
   attachments: {
     include: {
       uploadedBy: true,
@@ -45,6 +58,7 @@ export const taskInclude = {
       createdAt: "desc" as const,
     },
   },
+
   checklist: {
     include: {
       createdBy: true,
