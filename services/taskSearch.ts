@@ -44,6 +44,7 @@ export async function getTasks(
     orderBy: buildTaskSort(sort),
   });
 }
+
 export async function searchTasks(
   prisma: PrismaClient,
   userId: string,
@@ -81,6 +82,56 @@ export async function searchTasks(
 
   const where = {
     projectId,
+
+    ...buildTaskFilter(filter),
+
+    ...(search && {
+      title: {
+        contains: search,
+      },
+    }),
+  };
+
+  const total = await prisma.task.count({
+    where,
+  });
+
+  const items = await prisma.task.findMany({
+    where,
+    include: taskInclude,
+    orderBy: buildTaskSort(sort),
+    skip: (page - 1) * limit,
+    take: limit,
+  });
+
+  return {
+    items,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
+}
+
+export async function searchAllTasks(
+  prisma: PrismaClient,
+  userId: string,
+  search: string,
+  page: number,
+  limit: number,
+  filter?: {
+    status?: TaskStatus;
+    priority?: TaskPriority;
+    assigneeId?: string;
+    dueBefore?: string;
+    dueAfter?: string;
+  },
+  sort?: {
+    field: string;
+    order?: "ASC" | "DESC";
+  },
+) {
+  const where = {
+    project: getTaskAccessWhere(userId),
 
     ...buildTaskFilter(filter),
 

@@ -6,7 +6,7 @@ import {
   getTaskById,
   updateTask,
 } from "@/services/task";
-import { getTasks, searchTasks } from "@/services/taskSearch";
+import { getTasks, searchTasks, searchAllTasks } from "@/services/taskSearch";
 import {
   addComment,
   updateComment,
@@ -88,6 +88,48 @@ export const taskResolvers = {
         context.prisma,
         user.id,
         projectId,
+        search ?? "",
+        page ?? 1,
+        limit ?? 10,
+        filter,
+        sort,
+      );
+    },
+
+    searchAllTasks: async (
+      _: unknown,
+      {
+        search,
+        filter,
+        sort,
+        page,
+        limit,
+      }: {
+        search?: string;
+
+        filter?: {
+          status?: TaskStatus;
+          priority?: TaskPriority;
+          assigneeId?: string;
+          dueBefore?: string;
+          dueAfter?: string;
+        };
+
+        sort?: {
+          field: string;
+          order?: "ASC" | "DESC";
+        };
+
+        page?: number;
+        limit?: number;
+      },
+      context: any,
+    ) => {
+      const user = requireAuth(context);
+
+      return searchAllTasks(
+        context.prisma,
+        user.id,
         search ?? "",
         page ?? 1,
         limit ?? 10,

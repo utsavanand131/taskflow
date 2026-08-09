@@ -135,6 +135,14 @@ export const taskTypeDefs = gql`
       page: Int = 1
       limit: Int = 10
     ): TaskPage!
+
+    searchAllTasks(
+      search: String
+      filter: TaskFilterInput
+      sort: TaskSortInput
+      page: Int = 1
+      limit: Int = 10
+    ): TaskPage!
   }
 
   extend type Mutation {
