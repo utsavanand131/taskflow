@@ -7,6 +7,7 @@ export const userTypeDefs = gql`
     email: String!
     image: String
     emailVerified: Boolean!
+    hasPassword: Boolean!
     createdAt: String!
     updatedAt: String!
   }
@@ -24,5 +25,9 @@ export const userTypeDefs = gql`
     register(name: String!, email: String!, password: String!): AuthPayload!
 
     login(email: String!, password: String!): AuthPayload!
+
+    updateProfile(name: String!): User!
+
+    changePassword(currentPassword: String!, newPassword: String!): Boolean!
   }
 `;

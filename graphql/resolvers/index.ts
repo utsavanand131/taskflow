@@ -12,6 +12,10 @@ import { activityResolvers } from "./activity";
 import { labelResolvers } from "./label";
 
 export const resolvers = {
+  User: {
+    ...userResolvers.User,
+  },
+
   Query: {
     health: () => "TaskFlow GraphQL API is running ",
 

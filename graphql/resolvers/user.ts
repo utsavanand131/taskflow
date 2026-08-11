@@ -1,5 +1,9 @@
 import type { GraphQLContext } from "../context";
+
 import { registerUser, loginUser } from "@/services/auth";
+
+import { updateProfile, changePassword } from "@/services/account";
+
 import { requireAuth } from "@/lib/require-auth";
 
 interface RegisterArgs {
@@ -13,7 +17,22 @@ interface LoginArgs {
   password: string;
 }
 
+interface UpdateProfileArgs {
+  name: string;
+}
+
+interface ChangePasswordArgs {
+  currentPassword: string;
+  newPassword: string;
+}
+
 export const userResolvers = {
+  User: {
+    hasPassword: (user: { password?: string | null }) => {
+      return Boolean(user.password);
+    },
+  },
+
   Query: {
     me: (_parent: unknown, _args: unknown, context: GraphQLContext) => {
       return requireAuth(context);
@@ -35,6 +54,35 @@ export const userResolvers = {
       context: GraphQLContext,
     ) => {
       return loginUser(context.prisma, args);
+    },
+
+    updateProfile: async (
+      _parent: unknown,
+      args: UpdateProfileArgs,
+      context: GraphQLContext,
+    ) => {
+      const user = requireAuth(context);
+
+      return updateProfile(context.prisma, user.id, {
+        name: args.name,
+      });
+    },
+
+    changePassword: async (
+      _parent: unknown,
+      args: ChangePasswordArgs,
+      context: GraphQLContext,
+    ) => {
+      const user = requireAuth(context);
+
+      await changePassword(
+        context.prisma,
+        user.id,
+        args.currentPassword,
+        args.newPassword,
+      );
+
+      return true;
     },
   },
 };
