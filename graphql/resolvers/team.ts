@@ -1,6 +1,7 @@
 import type { GraphQLContext } from "../context";
 
 import { requireAuth } from "@/lib/require-auth";
+
 import {
   createTeam,
   deleteTeam,
@@ -8,6 +9,14 @@ import {
   getTeams,
   updateTeam,
 } from "@/services/team";
+
+import {
+  getTeamMembers,
+  removeTeamMember,
+  updateTeamMemberRole,
+} from "@/services/team-member";
+
+import { TeamRole } from "@/app/generated/prisma/enums";
 
 interface CreateTeamArgs {
   input: {
@@ -26,6 +35,23 @@ interface UpdateTeamArgs {
 
 interface TeamArgs {
   id: string;
+}
+
+interface TeamMembersArgs {
+  teamId: string;
+}
+
+interface RemoveTeamMemberArgs {
+  teamId: string;
+  userId: string;
+}
+
+interface UpdateTeamMemberRoleArgs {
+  input: {
+    teamId: string;
+    userId: string;
+    role: TeamRole;
+  };
 }
 
 export const teamResolvers = {
@@ -50,6 +76,16 @@ export const teamResolvers = {
       }
 
       return team;
+    },
+
+    teamMembers: async (
+      _parent: unknown,
+      args: TeamMembersArgs,
+      context: GraphQLContext,
+    ) => {
+      const user = requireAuth(context);
+
+      return getTeamMembers(context.prisma, args.teamId, user.id);
     },
   },
 
@@ -99,6 +135,37 @@ export const teamResolvers = {
       }
 
       return true;
+    },
+
+    removeTeamMember: async (
+      _parent: unknown,
+      args: RemoveTeamMemberArgs,
+      context: GraphQLContext,
+    ) => {
+      const user = requireAuth(context);
+
+      return removeTeamMember(
+        context.prisma,
+        args.teamId,
+        args.userId,
+        user.id,
+      );
+    },
+
+    updateTeamMemberRole: async (
+      _parent: unknown,
+      args: UpdateTeamMemberRoleArgs,
+      context: GraphQLContext,
+    ) => {
+      const user = requireAuth(context);
+
+      return updateTeamMemberRole(
+        context.prisma,
+        args.input.teamId,
+        args.input.userId,
+        args.input.role,
+        user.id,
+      );
     },
   },
 };

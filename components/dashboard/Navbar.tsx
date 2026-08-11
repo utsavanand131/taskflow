@@ -81,7 +81,7 @@ export default function Navbar({ setMobileOpen }: NavbarProps) {
       return "Tasks";
     }
 
-    if (pathname.startsWith("/teams")) {
+    if (pathname.startsWith("/team")) {
       return "Teams";
     }
 

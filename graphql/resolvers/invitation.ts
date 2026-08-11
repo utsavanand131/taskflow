@@ -3,15 +3,30 @@ import type { GraphQLContext } from "../context";
 import { requireAuth } from "@/lib/require-auth";
 
 import {
-  acceptInvitation,
-  getMyInvitations,
   inviteMember,
+  getMyInvitations,
+  acceptInvitation,
   rejectInvitation,
 } from "@/services/invitation";
 
+interface InviteMemberArgs {
+  input: {
+    teamId: string;
+    email: string;
+  };
+}
+
+interface InvitationArgs {
+  id: string;
+}
+
 export const invitationResolvers = {
   Query: {
-    myInvitations: async (_: unknown, __: unknown, context: GraphQLContext) => {
+    myInvitations: async (
+      _parent: unknown,
+      _args: unknown,
+      context: GraphQLContext,
+    ) => {
       const user = requireAuth(context);
 
       return getMyInvitations(context.prisma, user.email);
@@ -20,33 +35,38 @@ export const invitationResolvers = {
 
   Mutation: {
     inviteMember: async (
-      _: unknown,
-      { input }: { input: { teamId: string; email: string } },
+      _parent: unknown,
+      args: InviteMemberArgs,
       context: GraphQLContext,
     ) => {
       const user = requireAuth(context);
 
-      return inviteMember(context.prisma, input.teamId, input.email, user.id);
+      return inviteMember(
+        context.prisma,
+        args.input.teamId,
+        args.input.email,
+        user.id,
+      );
     },
 
     acceptInvitation: async (
-      _: unknown,
-      { id }: { id: string },
+      _parent: unknown,
+      args: InvitationArgs,
       context: GraphQLContext,
     ) => {
       const user = requireAuth(context);
 
-      return acceptInvitation(context.prisma, id, user.id, user.email);
+      return acceptInvitation(context.prisma, args.id, user.id, user.email);
     },
 
     rejectInvitation: async (
-      _: unknown,
-      { id }: { id: string },
+      _parent: unknown,
+      args: InvitationArgs,
       context: GraphQLContext,
     ) => {
       const user = requireAuth(context);
 
-      return rejectInvitation(context.prisma, id, user.email);
+      return rejectInvitation(context.prisma, args.id, user.email);
     },
   },
 };
