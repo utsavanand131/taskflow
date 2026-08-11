@@ -52,6 +52,43 @@ const INVITE_MEMBER_MUTATION = gql`
   }
 `;
 
+const UPDATE_MEMBER_ROLE_MUTATION = gql`
+  mutation UpdateTeamMemberRole($input: UpdateTeamMemberRoleInput!) {
+    updateTeamMemberRole(input: $input) {
+      id
+      role
+
+      user {
+        id
+        name
+        email
+      }
+
+      team {
+        id
+        name
+      }
+    }
+  }
+`;
+
+const REMOVE_MEMBER_MUTATION = gql`
+  mutation RemoveTeamMember($teamId: ID!, $userId: ID!) {
+    removeTeamMember(teamId: $teamId, userId: $userId)
+  }
+`;
+
+interface TeamMember {
+  id: string;
+  role: string;
+
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
 interface TeamResponse {
   team: {
     id: string;
@@ -59,17 +96,7 @@ interface TeamResponse {
     description?: string | null;
     createdAt: string;
     updatedAt: string;
-
-    members: {
-      id: string;
-      role: string;
-
-      user: {
-        id: string;
-        name: string;
-        email: string;
-      };
-    }[];
+    members: TeamMember[];
   } | null;
 }
 
@@ -110,6 +137,14 @@ export default function TeamDetailsPage() {
   const [inviteMember, { loading: inviting, error: inviteError }] =
     useMutation<InviteResponse>(INVITE_MEMBER_MUTATION);
 
+  const [updateMemberRole, { loading: updatingRole }] = useMutation(
+    UPDATE_MEMBER_ROLE_MUTATION,
+  );
+
+  const [removeMember, { loading: removingMember }] = useMutation(
+    REMOVE_MEMBER_MUTATION,
+  );
+
   async function handleInvite(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -131,9 +166,51 @@ export default function TeamDetailsPage() {
 
       setEmail("");
       setInviteMessage("Invitation sent successfully.");
+
       await refetch();
     } catch {
       // Apollo exposes the error through inviteError.
+    }
+  }
+
+  async function handleRoleChange(userId: string, role: string) {
+    try {
+      await updateMemberRole({
+        variables: {
+          input: {
+            teamId,
+            userId,
+            role,
+          },
+        },
+      });
+
+      await refetch();
+    } catch (error) {
+      console.error("Failed to update member role:", error);
+    }
+  }
+
+  async function handleRemoveMember(userId: string) {
+    const confirmed = window.confirm(
+      "Are you sure you want to remove this member from the team?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await removeMember({
+        variables: {
+          teamId,
+          userId,
+        },
+      });
+
+      await refetch();
+    } catch (error) {
+      console.error("Failed to remove team member:", error);
     }
   }
 
@@ -225,22 +302,51 @@ export default function TeamDetailsPage() {
         </div>
 
         <div>
-          {team.members.map((member) => (
-            <div
-              key={member.id}
-              className="flex items-center justify-between border-b p-5 last:border-b-0"
-            >
-              <div>
-                <p className="font-medium">{member.user.name}</p>
+          {team.members.map((member) => {
+            const isOwner = member.role === "OWNER";
 
-                <p className="text-sm text-gray-500">{member.user.email}</p>
+            return (
+              <div
+                key={member.id}
+                className="flex flex-col gap-4 border-b p-5 last:border-b-0 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <p className="font-medium">{member.user.name}</p>
+
+                  <p className="text-sm text-gray-500">{member.user.email}</p>
+                </div>
+
+                {isOwner ? (
+                  <span className="w-fit rounded-full border px-3 py-1 text-xs">
+                    OWNER
+                  </span>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={member.role}
+                      onChange={(event) =>
+                        handleRoleChange(member.user.id, event.target.value)
+                      }
+                      disabled={updatingRole || removingMember}
+                      className="rounded-lg border px-3 py-2 text-sm"
+                    >
+                      <option value="MEMBER">MEMBER</option>
+
+                      <option value="ADMIN">ADMIN</option>
+                    </select>
+
+                    <button
+                      onClick={() => handleRemoveMember(member.user.id)}
+                      disabled={updatingRole || removingMember}
+                      className="rounded-lg border px-3 py-2 text-sm text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {removingMember ? "Removing..." : "Remove"}
+                    </button>
+                  </div>
+                )}
               </div>
-
-              <span className="rounded-full border px-3 py-1 text-xs">
-                {member.role}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
