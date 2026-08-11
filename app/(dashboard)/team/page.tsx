@@ -27,6 +27,14 @@ const TEAMS_QUERY = gql`
   }
 `;
 
+const MY_INVITATIONS_QUERY = gql`
+  query MyInvitations {
+    myInvitations {
+      id
+    }
+  }
+`;
+
 interface Team {
   id: string;
   name: string;
@@ -50,8 +58,17 @@ interface TeamsResponse {
   teams: Team[];
 }
 
+interface InvitationsResponse {
+  myInvitations: {
+    id: string;
+  }[];
+}
+
 export default function TeamsPage() {
   const { data, loading, error } = useQuery<TeamsResponse>(TEAMS_QUERY);
+
+  const { data: invitationData } =
+    useQuery<InvitationsResponse>(MY_INVITATIONS_QUERY);
 
   if (loading) {
     return <div>Loading teams...</div>;
@@ -63,17 +80,30 @@ export default function TeamsPage() {
 
   const teams = data?.teams ?? [];
 
+  const pendingInvitations = invitationData?.myInvitations?.length ?? 0;
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4">
         <p className="text-sm text-gray-500">Manage your teams and members.</p>
 
-        <Link
-          href="/team/new"
-          className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
-        >
-          Create Team
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            href="/team/new"
+            className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+          >
+            Create Team
+          </Link>
+
+          {pendingInvitations > 0 && (
+            <Link
+              href="/team/invitations"
+              className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-gray-50"
+            >
+              Invitations ({pendingInvitations})
+            </Link>
+          )}
+        </div>
       </div>
 
       {teams.length === 0 ? (
