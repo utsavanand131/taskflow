@@ -1,7 +1,7 @@
 "use client";
 
 import { gql } from "@apollo/client";
-import { useQuery, useMutation } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { useParams } from "next/navigation";
 
 import ActivityTimeline from "@/components/tasks/ActivityTimeline";
@@ -273,114 +273,182 @@ export default function TaskDetailsPage() {
   }
 
   if (loading) {
-    return <div>Loading task...</div>;
+    return (
+      <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 p-6 text-zinc-400">
+        Loading task...
+      </div>
+    );
   }
 
   if (error) {
-    return <div>{error.message}</div>;
+    return (
+      <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 p-6 text-red-400">
+        {error.message}
+      </div>
+    );
   }
 
   if (!data?.task) {
-    return <div>Task not found.</div>;
+    return (
+      <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 p-6 text-zinc-400">
+        Task not found.
+      </div>
+    );
   }
 
   const task = data.task;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">{task.title}</h1>
+    <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 px-4 py-6 text-zinc-100 md:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl space-y-6">
+        <section className="border border-zinc-800 bg-zinc-900/80 p-6">
+          <div className="flex flex-col gap-5">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-zinc-600">
+                Task Details
+              </p>
 
-        {task.description && (
-          <p className="mt-4 text-muted-foreground">{task.description}</p>
-        )}
+              <h1 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-100 md:text-3xl">
+                {task.title}
+              </h1>
 
-        <div className="mt-6 space-y-4 text-sm">
-          <p>Project: {task.project.name}</p>
+              {task.description && (
+                <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-400">
+                  {task.description}
+                </p>
+              )}
+            </div>
 
-          <TaskAssignee
-            taskId={task.id}
-            assignee={task.assignee ?? null}
-            owner={task.project.owner}
-            team={task.project.team}
-            onAssigneeChanged={() => refetch()}
-          />
+            <div className="grid gap-4 border-t border-zinc-800 pt-5 sm:grid-cols-2">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-zinc-600">
+                  Project
+                </p>
+                <p className="mt-1 text-sm text-zinc-300">
+                  {task.project.name}
+                </p>
+              </div>
 
-          <div className="flex items-center gap-3">
-            <span>Status:</span>
-
-            <select
-              value={task.status}
-              onChange={(e) => handleStatusChange(e.target.value)}
-              className="rounded-md border px-3 py-1"
-            >
-              <option value="TODO">TODO</option>
-              <option value="IN_PROGRESS">IN_PROGRESS</option>
-              <option value="DONE">DONE</option>
-            </select>
+              <div>
+                <p className="text-xs uppercase tracking-wide text-zinc-600">
+                  Created
+                </p>
+                <p className="mt-1 text-sm text-zinc-300">
+                  {new Date(Number(task.createdAt)).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
           </div>
+        </section>
 
-          <div className="flex items-center gap-3">
-            <span>Priority:</span>
+        <section className="border border-zinc-800 bg-zinc-900/80 p-6">
+          <h2 className="text-lg font-semibold text-zinc-100">
+            Task Properties
+          </h2>
 
-            <select
-              value={task.priority}
-              onChange={(e) => handlePriorityChange(e.target.value)}
-              className="rounded-md border px-3 py-1"
-            >
-              <option value="LOW">LOW</option>
-              <option value="MEDIUM">MEDIUM</option>
-              <option value="HIGH">HIGH</option>
-              <option value="URGENT">URGENT</option>
-            </select>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <span>Due Date:</span>
-
-            <input
-              type="date"
-              value={
-                task.dueDate
-                  ? new Date(Number(task.dueDate)).toISOString().split("T")[0]
-                  : ""
-              }
-              onChange={(e) => handleDueDateChange(e.target.value)}
-              className="rounded-md border px-3 py-1"
+          <div className="mt-5 space-y-5">
+            <TaskAssignee
+              taskId={task.id}
+              assignee={task.assignee ?? null}
+              owner={task.project.owner}
+              team={task.project.team}
+              onAssigneeChanged={() => refetch()}
             />
+
+            <div className="grid gap-5 md:grid-cols-3">
+              <div className="space-y-2">
+                <label
+                  htmlFor="task-status"
+                  className="text-xs font-medium uppercase tracking-wide text-zinc-500"
+                >
+                  Status
+                </label>
+
+                <select
+                  id="task-status"
+                  value={task.status}
+                  onChange={(e) => handleStatusChange(e.target.value)}
+                  className="w-full border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-200 outline-none transition focus:border-zinc-500"
+                >
+                  <option value="TODO">TODO</option>
+                  <option value="IN_PROGRESS">IN_PROGRESS</option>
+                  <option value="DONE">DONE</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="task-priority"
+                  className="text-xs font-medium uppercase tracking-wide text-zinc-500"
+                >
+                  Priority
+                </label>
+
+                <select
+                  id="task-priority"
+                  value={task.priority}
+                  onChange={(e) => handlePriorityChange(e.target.value)}
+                  className="w-full border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-200 outline-none transition focus:border-zinc-500"
+                >
+                  <option value="LOW">LOW</option>
+                  <option value="MEDIUM">MEDIUM</option>
+                  <option value="HIGH">HIGH</option>
+                  <option value="URGENT">URGENT</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="task-due-date"
+                  className="text-xs font-medium uppercase tracking-wide text-zinc-500"
+                >
+                  Due Date
+                </label>
+
+                <input
+                  id="task-due-date"
+                  type="date"
+                  value={
+                    task.dueDate
+                      ? new Date(Number(task.dueDate))
+                          .toISOString()
+                          .split("T")[0]
+                      : ""
+                  }
+                  onChange={(e) => handleDueDateChange(e.target.value)}
+                  className="w-full border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-200 outline-none transition focus:border-zinc-500"
+                />
+              </div>
+            </div>
           </div>
+        </section>
 
-          <p>
-            Created: {new Date(Number(task.createdAt)).toLocaleDateString()}
-          </p>
-        </div>
+        <TaskLabels
+          taskId={task.id}
+          labels={task.labels}
+          onLabelsChanged={() => refetch()}
+        />
+
+        <TaskChecklist
+          taskId={task.id}
+          checklist={task.checklist}
+          onChecklistChanged={() => refetch()}
+        />
+
+        <TaskAttachments
+          taskId={task.id}
+          attachments={task.attachments}
+          onAttachmentsChanged={() => refetch()}
+        />
+
+        <TaskComments
+          taskId={task.id}
+          comments={task.comments}
+          onCommentAdded={() => refetch()}
+        />
+
+        <ActivityTimeline activities={data.activities} />
       </div>
-
-      <TaskLabels
-        taskId={task.id}
-        labels={task.labels}
-        onLabelsChanged={() => refetch()}
-      />
-
-      <TaskChecklist
-        taskId={task.id}
-        checklist={task.checklist}
-        onChecklistChanged={() => refetch()}
-      />
-
-      <TaskAttachments
-        taskId={task.id}
-        attachments={task.attachments}
-        onAttachmentsChanged={() => refetch()}
-      />
-
-      <TaskComments
-        taskId={task.id}
-        comments={task.comments}
-        onCommentAdded={() => refetch()}
-      />
-
-      <ActivityTimeline activities={data.activities} />
     </div>
   );
 }
