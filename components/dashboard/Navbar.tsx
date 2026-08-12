@@ -170,55 +170,62 @@ export default function Navbar({ setMobileOpen }: NavbarProps) {
   }
 
   return (
-    <header className="flex h-16 items-center justify-between border-b px-4 md:px-6">
+    <header className="flex h-16 items-center justify-between border-b border-zinc-800 bg-zinc-950/90 px-4 text-zinc-100 backdrop-blur-md md:px-6">
       <div className="flex items-center gap-3">
         <button
           type="button"
-          className="rounded-md p-2 hover:bg-gray-100 md:hidden"
+          className="border border-zinc-800 bg-zinc-900 p-2 text-zinc-400 transition hover:border-zinc-700 hover:bg-zinc-800 hover:text-zinc-100 md:hidden"
           onClick={() => setMobileOpen(true)}
+          aria-label="Open menu"
         >
           <Menu size={20} />
         </button>
 
-        <h2 className="text-lg font-semibold">{pageTitle}</h2>
+        <h2 className="text-lg font-semibold tracking-tight text-zinc-100">
+          {pageTitle}
+        </h2>
       </div>
 
-      <div className="flex items-center gap-2 md:gap-4">
+      <div className="flex items-center gap-2 md:gap-3">
         <div ref={notificationRef} className="relative">
           <button
             type="button"
             onClick={() => setNotificationsOpen((current) => !current)}
-            className="relative rounded-full p-2 hover:bg-gray-100"
+            className="relative flex h-10 w-10 items-center justify-center border border-zinc-800 bg-zinc-900 text-zinc-400 transition hover:border-zinc-700 hover:bg-zinc-800 hover:text-zinc-100"
             aria-label="Notifications"
           >
-            <Bell size={20} />
+            <Bell size={19} />
 
             {unreadCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white">
+              <span className="absolute -right-1 -top-1 flex min-h-5 min-w-5 items-center justify-center bg-red-500 px-1 text-[10px] font-semibold text-white">
                 {unreadCount > 99 ? "99+" : unreadCount}
               </span>
             )}
           </button>
 
           {notificationsOpen && (
-            <div className="absolute right-0 top-12 z-50 w-80 overflow-hidden rounded-xl border bg-white text-gray-900 shadow-lg">
-              <div className="flex items-center justify-between border-b px-4 py-3">
-                <h3 className="font-semibold">Notifications</h3>
+            <div className="absolute right-0 top-12 z-50 w-80 overflow-hidden border border-zinc-800 bg-zinc-900 text-zinc-100 shadow-2xl">
+              <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3">
+                <div>
+                  <h3 className="text-sm font-semibold text-zinc-100">
+                    Notifications
+                  </h3>
 
-                {unreadCount > 0 && (
-                  <span className="text-xs text-muted-foreground">
-                    {unreadCount} unread
-                  </span>
-                )}
+                  {unreadCount > 0 && (
+                    <p className="mt-0.5 text-xs text-zinc-500">
+                      {unreadCount} unread
+                    </p>
+                  )}
+                </div>
               </div>
 
               <div className="max-h-96 overflow-y-auto">
                 {loading ? (
-                  <div className="p-4 text-sm text-muted-foreground">
+                  <div className="p-4 text-sm text-zinc-500">
                     Loading notifications...
                   </div>
                 ) : combinedNotifications.length === 0 ? (
-                  <div className="p-6 text-center text-sm text-muted-foreground">
+                  <div className="p-6 text-center text-sm text-zinc-500">
                     No notifications yet.
                   </div>
                 ) : (
@@ -227,21 +234,23 @@ export default function Navbar({ setMobileOpen }: NavbarProps) {
                       key={notification.id}
                       type="button"
                       onClick={() => handleNotificationClick(notification)}
-                      className={`w-full border-b px-4 py-3 text-left transition hover:bg-gray-50 ${
-                        notification.read ? "bg-white" : "bg-blue-50"
+                      className={`w-full border-b border-zinc-800 px-4 py-3 text-left transition ${
+                        notification.read
+                          ? "bg-zinc-900 hover:bg-zinc-800"
+                          : "bg-zinc-800/80 hover:bg-zinc-800"
                       }`}
                     >
                       <div className="flex items-start gap-3">
                         {!notification.read && (
-                          <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-blue-500" />
+                          <span className="mt-1.5 h-2 w-2 shrink-0 bg-blue-500" />
                         )}
 
                         <div className={notification.read ? "pl-5" : ""}>
-                          <p className="text-sm font-medium text-gray-900">
+                          <p className="text-sm font-medium leading-5 text-zinc-100">
                             {notification.message}
                           </p>
 
-                          <p className="mt-1 text-xs text-gray-500">
+                          <p className="mt-1 text-xs text-zinc-500">
                             {formatNotificationDate(notification.createdAt)}
                           </p>
                         </div>
@@ -257,9 +266,9 @@ export default function Navbar({ setMobileOpen }: NavbarProps) {
         <button
           type="button"
           onClick={handleLogout}
-          className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-gray-100"
+          className="flex h-10 items-center gap-2 border border-zinc-800 bg-zinc-900 px-3 text-sm font-medium text-zinc-300 transition hover:border-zinc-700 hover:bg-zinc-800 hover:text-zinc-100"
         >
-          <LogOut size={18} />
+          <LogOut size={17} />
 
           <span className="hidden sm:inline">Logout</span>
         </button>
