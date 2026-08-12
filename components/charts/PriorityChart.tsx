@@ -24,10 +24,10 @@ function CustomTooltip({ active, payload }: any) {
   }
 
   return (
-    <div className="rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm shadow-xl">
-      <p className="font-medium text-white">{payload[0].name}</p>
+    <div className="border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm shadow-xl">
+      <p className="font-medium text-zinc-100">{payload[0].name}</p>
 
-      <p className="mt-1 text-zinc-300">{payload[0].value} tasks</p>
+      <p className="mt-1 text-zinc-400">{payload[0].value} tasks</p>
     </div>
   );
 }
@@ -55,8 +55,10 @@ export default function PriorityChart({ data }: PriorityChartProps) {
   const colors = ["#22c55e", "#eab308", "#f97316", "#ef4444"];
 
   return (
-    <div className="rounded-xl border p-5">
-      <h2 className="mb-4 text-lg font-semibold">Task Priority</h2>
+    <div className="border border-zinc-800 bg-zinc-900/80 p-5">
+      <h2 className="mb-4 text-lg font-semibold text-zinc-100">
+        Task Priority
+      </h2>
 
       <div className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
@@ -74,7 +76,11 @@ export default function PriorityChart({ data }: PriorityChartProps) {
 
             <Tooltip content={<CustomTooltip />} />
 
-            <Legend />
+            <Legend
+              wrapperStyle={{
+                color: "#a1a1aa",
+              }}
+            />
           </PieChart>
         </ResponsiveContainer>
       </div>
