@@ -38,19 +38,29 @@ export default function TaskCard({ projectId, task }: TaskCardProps) {
       {...listeners}
       {...attributes}
       onClick={handleClick}
-      className={`cursor-pointer select-none rounded-xl border p-4 space-y-3 transition hover:border-primary ${
-        isDragging ? "opacity-50" : ""
+      className={`cursor-pointer select-none border border-zinc-800 bg-zinc-900/90 p-4 transition ${
+        isDragging
+          ? "scale-[0.98] opacity-50"
+          : "hover:border-zinc-700 hover:bg-zinc-900"
       }`}
     >
-      <h3 className="font-semibold">{task.title}</h3>
+      <div className="space-y-3">
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="min-w-0 text-sm font-semibold leading-5 text-zinc-100">
+            {task.title}
+          </h3>
 
-      {task.description && (
-        <p className="text-sm text-muted-foreground">{task.description}</p>
-      )}
+          <span className="shrink-0 border border-zinc-700 bg-zinc-950 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-zinc-400">
+            {task.priority}
+          </span>
+        </div>
 
-      <span className="inline-block rounded-full border px-3 py-1 text-xs">
-        {task.priority}
-      </span>
+        {task.description && (
+          <p className="line-clamp-3 text-xs leading-5 text-zinc-500">
+            {task.description}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
