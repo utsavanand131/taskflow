@@ -14,17 +14,21 @@ export default function StatsCard({
   description,
 }: StatsCardProps) {
   return (
-    <div className="rounded-xl border p-5">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-500">{title}</p>
+    <div className="border border-zinc-800 bg-zinc-900/80 p-5 transition-colors hover:border-zinc-700">
+      <div className="flex items-start justify-between gap-4">
+        <p className="text-sm font-medium text-zinc-400">{title}</p>
 
-        <Icon size={20} />
+        <div className="flex h-9 w-9 items-center justify-center border border-zinc-800 bg-zinc-950">
+          <Icon size={18} className="text-zinc-300" />
+        </div>
       </div>
 
-      <h2 className="mt-3 text-3xl font-bold">{value}</h2>
+      <h2 className="mt-4 text-3xl font-semibold tracking-tight text-zinc-100">
+        {value}
+      </h2>
 
       {description && (
-        <p className="mt-1 text-sm text-gray-500">{description}</p>
+        <p className="mt-1 text-sm text-zinc-500">{description}</p>
       )}
     </div>
   );
