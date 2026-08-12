@@ -2,6 +2,7 @@
 
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
+
 import ProjectCard from "@/components/projects/ProjectCard";
 import CreateProjectDialog from "@/components/projects/CreateProjectDialog";
 
@@ -34,31 +35,44 @@ export default function ProjectsPage() {
     useQuery<ProjectsResponse>(PROJECTS_QUERY);
 
   if (loading) {
-    return <div>Loading projects...</div>;
+    return (
+      <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 p-6 text-zinc-400">
+        Loading projects...
+      </div>
+    );
   }
 
   if (error) {
-    return <div>{error.message}</div>;
+    return (
+      <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 p-6 text-red-400">
+        {error.message}
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <p className="text-gray-500">Manage your workspace projects</p>
-        <CreateProjectDialog onCreated={() => refetch()} />
-      </div>
+    <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 px-4 py-6 text-zinc-100 md:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl space-y-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-zinc-400">
+            Manage your workspace projects
+          </p>
 
-      {data?.projects.length === 0 ? (
-        <div className="rounded-xl border p-8 text-center">
-          No projects yet.
+          <CreateProjectDialog onCreated={() => refetch()} />
         </div>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {data?.projects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
-        </div>
-      )}
+
+        {data?.projects.length === 0 ? (
+          <div className="border border-dashed border-zinc-800 bg-zinc-900/60 p-10 text-center">
+            <p className="text-sm text-zinc-500">No projects yet.</p>
+          </div>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {data?.projects.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
