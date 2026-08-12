@@ -55,6 +55,7 @@ const DASHBOARD_QUERY = gql`
     }
   }
 `;
+
 interface DashboardResponse {
   dashboardStats: {
     projects: {
@@ -99,11 +100,19 @@ export default function DashboardPage() {
   const { data, loading, error } = useQuery<DashboardResponse>(DASHBOARD_QUERY);
 
   if (loading) {
-    return <div>Loading dashboard...</div>;
+    return (
+      <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 p-6 text-zinc-400">
+        Loading dashboard...
+      </div>
+    );
   }
 
   if (error) {
-    return <div>{error.message}</div>;
+    return (
+      <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 p-6 text-red-400">
+        {error.message}
+      </div>
+    );
   }
 
   const stats = data?.dashboardStats;
@@ -113,43 +122,48 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <p className="text-gray-500">Overview of your workspace</p>
+    <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 px-4 py-6 text-zinc-100 md:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl space-y-6">
+        <div>
+          <p className="text-sm text-zinc-400">Overview of your workspace</p>
+        </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatsCard
-          title="Projects"
-          value={stats.projects.total}
-          icon={FolderKanban}
-          description={`${stats.projects.active} active`}
-        />
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <StatsCard
+            title="Projects"
+            value={stats.projects.total}
+            icon={FolderKanban}
+            description={`${stats.projects.active} active`}
+          />
 
-        <StatsCard
-          title="Tasks"
-          value={stats.tasks.total}
-          icon={CheckSquare}
-          description={`${stats.tasks.completed} completed`}
-        />
+          <StatsCard
+            title="Tasks"
+            value={stats.tasks.total}
+            icon={CheckSquare}
+            description={`${stats.tasks.completed} completed`}
+          />
 
-        <StatsCard
-          title="Completion Rate"
-          value={`${stats.tasks.completionRate}%`}
-          icon={CircleCheck}
-        />
+          <StatsCard
+            title="Completion Rate"
+            value={`${stats.tasks.completionRate}%`}
+            icon={CircleCheck}
+          />
 
-        <StatsCard
-          title="Overdue"
-          value={stats.tasks.overdue}
-          icon={AlertTriangle}
-        />
+          <StatsCard
+            title="Overdue"
+            value={stats.tasks.overdue}
+            icon={AlertTriangle}
+          />
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <PriorityChart data={stats.analytics.priorityDistribution} />
+
+          <ProjectProgressChart data={stats.analytics.projectProgress} />
+        </div>
+
+        <ActivityFeed activities={stats.recentActivity} />
       </div>
-      <div className="grid gap-6 lg:grid-cols-2">
-        <PriorityChart data={stats.analytics.priorityDistribution} />
-
-        <ProjectProgressChart data={stats.analytics.projectProgress} />
-      </div>
-
-      <ActivityFeed activities={stats.recentActivity} />
     </div>
   );
 }
