@@ -1,7 +1,7 @@
 "use client";
 
 import { gql } from "@apollo/client";
-import { useQuery, useMutation } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import {
   DndContext,
   DragEndEvent,
@@ -133,84 +133,120 @@ export default function ProjectDetailsPage() {
   }
 
   if (loading) {
-    return <div>Loading project...</div>;
+    return (
+      <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 p-6 text-zinc-400">
+        Loading project...
+      </div>
+    );
   }
 
   if (error) {
-    return <div>{error.message}</div>;
+    return (
+      <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 p-6 text-red-400">
+        {error.message}
+      </div>
+    );
   }
 
   if (!data?.project) {
-    return <div>Project not found.</div>;
+    return (
+      <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 p-6 text-zinc-400">
+        Project not found.
+      </div>
+    );
   }
 
   const project = data.project;
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-xl border p-6">
-        <div className="flex items-center gap-3">
-          <div
-            className="h-5 w-5 rounded-full"
-            style={{
-              backgroundColor: project.color || "#6366f1",
-            }}
-          />
-
-          <h1 className="text-3xl font-bold">{project.name}</h1>
-        </div>
-
-        <span className="mt-4 inline-block rounded-full border px-3 py-1 text-sm">
-          {project.status}
-        </span>
-
-        {project.description && (
-          <p className="mt-4 text-gray-500">{project.description}</p>
-        )}
-
-        <div className="mt-6 text-sm text-gray-500">
-          <p>Owner: {project.owner.name}</p>
-
-          <p>
-            Created: {new Date(Number(project.createdAt)).toLocaleDateString()}
-          </p>
-        </div>
-      </div>
-
-      <div className="rounded-xl border p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Tasks</h2>
-
-          <CreateTaskDialog
-            projectId={project.id}
-            onCreated={() => refetch()}
-          />
-        </div>
-
-        <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-          <div className="grid gap-4 lg:grid-cols-3">
-            <KanbanColumn
-              id="TODO"
-              title="TODO"
-              projectId={project.id}
-              tasks={data.tasks.filter((task) => task.status === "TODO")}
+    <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 px-4 py-6 text-zinc-100 md:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl space-y-6">
+        <div className="border border-zinc-800 bg-zinc-900/80 p-6">
+          <div className="flex flex-wrap items-center gap-3">
+            <div
+              className="h-5 w-5 shrink-0"
+              style={{
+                backgroundColor: project.color || "#6366f1",
+              }}
             />
 
-            <KanbanColumn
-              id="IN_PROGRESS"
-              title="IN_PROGRESS"
-              projectId={project.id}
-              tasks={data.tasks.filter((task) => task.status === "IN_PROGRESS")}
-            />
+            <h1 className="text-2xl font-bold tracking-tight text-zinc-100 md:text-3xl">
+              {project.name}
+            </h1>
+          </div>
 
-            <KanbanColumn
-              id="DONE"
-              title="DONE"
+          <span className="mt-4 inline-block border border-zinc-700 bg-zinc-950 px-3 py-1 text-xs font-medium text-zinc-300">
+            {project.status}
+          </span>
+
+          {project.description && (
+            <p className="mt-4 max-w-3xl text-sm leading-6 text-zinc-400">
+              {project.description}
+            </p>
+          )}
+
+          <div className="mt-6 grid gap-4 border-t border-zinc-800 pt-5 text-sm sm:grid-cols-2">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-zinc-600">
+                Owner
+              </p>
+              <p className="mt-1 text-zinc-300">{project.owner.name}</p>
+            </div>
+
+            <div>
+              <p className="text-xs uppercase tracking-wide text-zinc-600">
+                Created
+              </p>
+              <p className="mt-1 text-zinc-300">
+                {new Date(Number(project.createdAt)).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="border border-zinc-800 bg-zinc-900/80 p-6">
+          <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-zinc-100">Tasks</h2>
+
+              <p className="mt-1 text-sm text-zinc-500">
+                Drag tasks between columns to update their status.
+              </p>
+            </div>
+
+            <CreateTaskDialog
               projectId={project.id}
-              tasks={data.tasks.filter((task) => task.status === "DONE")}
+              onCreated={() => refetch()}
             />
           </div>
-        </DndContext>
+
+          <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+            <div className="grid gap-4 lg:grid-cols-3">
+              <KanbanColumn
+                id="TODO"
+                title="TODO"
+                projectId={project.id}
+                tasks={data.tasks.filter((task) => task.status === "TODO")}
+              />
+
+              <KanbanColumn
+                id="IN_PROGRESS"
+                title="IN_PROGRESS"
+                projectId={project.id}
+                tasks={data.tasks.filter(
+                  (task) => task.status === "IN_PROGRESS",
+                )}
+              />
+
+              <KanbanColumn
+                id="DONE"
+                title="DONE"
+                projectId={project.id}
+                tasks={data.tasks.filter((task) => task.status === "DONE")}
+              />
+            </div>
+          </DndContext>
+        </div>
       </div>
     </div>
   );
