@@ -94,6 +94,7 @@ export default function TaskLabels({
   const [createLabel, { loading: creating }] = useMutation<CreateLabelResponse>(
     CREATE_LABEL_MUTATION,
   );
+
   const [assignLabel, { loading: assigning }] = useMutation(
     ASSIGN_LABEL_MUTATION,
   );
@@ -168,33 +169,41 @@ export default function TaskLabels({
   }
 
   return (
-    <div className="rounded-xl border p-6 space-y-6">
-      <h2 className="text-xl font-semibold">Labels</h2>
+    <div className="border border-zinc-800 bg-zinc-900/80 p-6">
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold text-zinc-100">Labels</h2>
+
+        <p className="mt-1 text-sm text-zinc-500">
+          Organize this task with reusable labels.
+        </p>
+      </div>
 
       <div className="space-y-3">
         {labels.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No labels assigned.</p>
+          <div className="border border-dashed border-zinc-800 p-5">
+            <p className="text-sm text-zinc-500">No labels assigned.</p>
+          </div>
         ) : (
           <div className="flex flex-wrap gap-2">
             {labels.map((label) => (
               <div
                 key={label.id}
-                className="flex items-center gap-2 rounded-full border px-3 py-1.5"
+                className="flex items-center gap-2 border border-zinc-700 bg-zinc-950 px-3 py-1.5"
               >
                 <span
-                  className="h-3 w-3 rounded-full"
+                  className="h-2.5 w-2.5 shrink-0"
                   style={{
                     backgroundColor: label.color || "#6B7280",
                   }}
                 />
 
-                <span className="text-sm">{label.name}</span>
+                <span className="text-sm text-zinc-200">{label.name}</span>
 
                 <button
                   type="button"
                   onClick={() => handleRemove(label.id)}
                   disabled={removing}
-                  className="ml-1 text-xs text-muted-foreground hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                  className="ml-1 text-sm text-zinc-500 transition hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50"
                   aria-label={`Remove ${label.name} label`}
                 >
                   ×
@@ -205,15 +214,17 @@ export default function TaskLabels({
         )}
       </div>
 
-      <div className="space-y-3">
-        <p className="text-sm font-medium">Assign existing label</p>
+      <div className="mt-6 space-y-3 border-t border-zinc-800 pt-5">
+        <p className="text-sm font-medium text-zinc-300">
+          Assign existing label
+        </p>
 
         <div className="flex flex-col gap-3 sm:flex-row">
           <select
             value={selectedLabelId}
             onChange={(e) => setSelectedLabelId(e.target.value)}
             disabled={labelsLoading}
-            className="flex-1 rounded-lg border px-3 py-2 text-sm outline-none"
+            className="flex-1 border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-200 outline-none transition focus:border-zinc-500"
           >
             <option value="">
               {labelsLoading ? "Loading labels..." : "Select a label"}
@@ -230,21 +241,21 @@ export default function TaskLabels({
             type="button"
             onClick={handleAssign}
             disabled={assigning || !selectedLabelId}
-            className="rounded-lg border px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+            className="border border-zinc-700 bg-zinc-950 px-4 py-2 text-sm font-medium text-zinc-200 transition hover:border-zinc-600 hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {assigning ? "Assigning..." : "Assign"}
           </button>
         </div>
 
         {!labelsLoading && labelsData && availableLabels.length === 0 && (
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-zinc-600">
             No other existing labels are available.
           </p>
         )}
       </div>
 
-      <div className="space-y-3 border-t pt-5">
-        <p className="text-sm font-medium">Create new label</p>
+      <div className="mt-6 space-y-3 border-t border-zinc-800 pt-5">
+        <p className="text-sm font-medium text-zinc-300">Create new label</p>
 
         <div className="flex flex-col gap-3 sm:flex-row">
           <input
@@ -252,14 +263,14 @@ export default function TaskLabels({
             value={newLabelName}
             onChange={(e) => setNewLabelName(e.target.value)}
             placeholder="Label name..."
-            className="flex-1 rounded-lg border px-3 py-2 text-sm outline-none"
+            className="flex-1 border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-200 outline-none placeholder:text-zinc-600 transition focus:border-zinc-500"
           />
 
           <input
             type="color"
             value={newLabelColor}
             onChange={(e) => setNewLabelColor(e.target.value)}
-            className="h-10 w-14 cursor-pointer rounded-lg border p-1"
+            className="h-10 w-14 cursor-pointer border border-zinc-700 bg-zinc-950 p-1"
             aria-label="Label color"
           />
 
@@ -267,7 +278,7 @@ export default function TaskLabels({
             type="button"
             onClick={handleCreate}
             disabled={creating || assigning || !newLabelName.trim()}
-            className="rounded-lg border px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+            className="border border-zinc-700 bg-zinc-950 px-4 py-2 text-sm font-medium text-zinc-200 transition hover:border-zinc-600 hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {creating ? "Creating..." : "Create & Assign"}
           </button>
