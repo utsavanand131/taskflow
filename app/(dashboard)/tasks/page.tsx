@@ -144,160 +144,238 @@ export default function TasksPage() {
   }
 
   if (loading) {
-    return <div>Loading tasks...</div>;
+    return (
+      <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 p-6 text-zinc-400">
+        Loading tasks...
+      </div>
+    );
   }
 
   if (error) {
-    return <div>{error.message}</div>;
+    return (
+      <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 p-6 text-red-400">
+        {error.message}
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <p className="text-sm text-muted-foreground">
-          Manage tasks across your projects.
-        </p>
-      </div>
-
-      <div className="space-y-4 rounded-xl border p-4">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => handleSearchChange(e.target.value)}
-          placeholder="Search tasks..."
-          className="w-full rounded-md border px-3 py-2 text-sm"
-        />
-
-        <div className="flex flex-wrap gap-3">
-          <select
-            value={status}
-            onChange={(e) => handleStatusChange(e.target.value)}
-            className="rounded-md border px-3 py-2 text-sm"
-          >
-            <option value="">All statuses</option>
-            <option value="TODO">TODO</option>
-            <option value="IN_PROGRESS">IN_PROGRESS</option>
-            <option value="DONE">DONE</option>
-          </select>
-
-          <select
-            value={priority}
-            onChange={(e) => handlePriorityChange(e.target.value)}
-            className="rounded-md border px-3 py-2 text-sm"
-          >
-            <option value="">All priorities</option>
-            <option value="LOW">LOW</option>
-            <option value="MEDIUM">MEDIUM</option>
-            <option value="HIGH">HIGH</option>
-            <option value="URGENT">URGENT</option>
-          </select>
-
-          <select
-            value={sortField}
-            onChange={(e) => handleSortFieldChange(e.target.value)}
-            className="rounded-md border px-3 py-2 text-sm"
-          >
-            <option value="CREATED_AT">Created date</option>
-            <option value="UPDATED_AT">Updated date</option>
-            <option value="DUE_DATE">Due date</option>
-            <option value="PRIORITY">Priority</option>
-            <option value="TITLE">Title</option>
-          </select>
-
-          <select
-            value={sortOrder}
-            onChange={(e) =>
-              handleSortOrderChange(e.target.value as "ASC" | "DESC")
-            }
-            className="rounded-md border px-3 py-2 text-sm"
-          >
-            <option value="DESC">Descending</option>
-            <option value="ASC">Ascending</option>
-          </select>
+    <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 px-4 py-6 text-zinc-100 md:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl space-y-6">
+        <div>
+          <p className="text-sm text-zinc-400">
+            Manage tasks across your projects.
+          </p>
         </div>
-      </div>
 
-      <div className="text-sm text-muted-foreground">
-        {total} {total === 1 ? "task" : "tasks"}
-      </div>
+        <div className="border border-zinc-800 bg-zinc-900/80 p-5">
+          <div className="space-y-4">
+            <div>
+              <label
+                htmlFor="task-search"
+                className="text-xs font-medium uppercase tracking-wide text-zinc-500"
+              >
+                Search
+              </label>
 
-      {tasks.length === 0 ? (
-        <div className="rounded-xl border p-8 text-center">
-          <p className="text-sm text-muted-foreground">No tasks found.</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {tasks.map((task) => (
-            <Link
-              key={task.id}
-              href={`/projects/${task.project.id}/tasks/${task.id}`}
-              className="block rounded-xl border p-4 transition hover:bg-muted/50"
-            >
-              <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                <div className="min-w-0">
-                  <h2 className="font-medium">{task.title}</h2>
+              <input
+                id="task-search"
+                type="text"
+                value={search}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                placeholder="Search tasks..."
+                className="mt-2 w-full border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-zinc-200 outline-none placeholder:text-zinc-600 transition focus:border-zinc-500"
+              />
+            </div>
 
-                  {task.description && (
-                    <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-                      {task.description}
-                    </p>
-                  )}
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <div>
+                <label
+                  htmlFor="task-status"
+                  className="text-xs font-medium uppercase tracking-wide text-zinc-500"
+                >
+                  Status
+                </label>
 
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    Project: {task.project.name}
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap gap-2 text-xs">
-                  <span className="rounded-md border px-2 py-1">
-                    {task.status}
-                  </span>
-
-                  <span className="rounded-md border px-2 py-1">
-                    {task.priority}
-                  </span>
-
-                  <span className="rounded-md border px-2 py-1">
-                    {task.assignee?.name ?? "Unassigned"}
-                  </span>
-                </div>
+                <select
+                  id="task-status"
+                  value={status}
+                  onChange={(e) => handleStatusChange(e.target.value)}
+                  className="mt-2 w-full border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-zinc-200 outline-none transition focus:border-zinc-500"
+                >
+                  <option value="">All statuses</option>
+                  <option value="TODO">TODO</option>
+                  <option value="IN_PROGRESS">IN_PROGRESS</option>
+                  <option value="DONE">DONE</option>
+                </select>
               </div>
 
-              <div className="mt-3 text-xs text-muted-foreground">
-                Due: {formatDueDate(task.dueDate)}
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
+              <div>
+                <label
+                  htmlFor="task-priority"
+                  className="text-xs font-medium uppercase tracking-wide text-zinc-500"
+                >
+                  Priority
+                </label>
 
-      {totalPages > 1 && (
+                <select
+                  id="task-priority"
+                  value={priority}
+                  onChange={(e) => handlePriorityChange(e.target.value)}
+                  className="mt-2 w-full border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-zinc-200 outline-none transition focus:border-zinc-500"
+                >
+                  <option value="">All priorities</option>
+                  <option value="LOW">LOW</option>
+                  <option value="MEDIUM">MEDIUM</option>
+                  <option value="HIGH">HIGH</option>
+                  <option value="URGENT">URGENT</option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="task-sort-field"
+                  className="text-xs font-medium uppercase tracking-wide text-zinc-500"
+                >
+                  Sort by
+                </label>
+
+                <select
+                  id="task-sort-field"
+                  value={sortField}
+                  onChange={(e) => handleSortFieldChange(e.target.value)}
+                  className="mt-2 w-full border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-zinc-200 outline-none transition focus:border-zinc-500"
+                >
+                  <option value="CREATED_AT">Created date</option>
+                  <option value="UPDATED_AT">Updated date</option>
+                  <option value="DUE_DATE">Due date</option>
+                  <option value="PRIORITY">Priority</option>
+                  <option value="TITLE">Title</option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="task-sort-order"
+                  className="text-xs font-medium uppercase tracking-wide text-zinc-500"
+                >
+                  Order
+                </label>
+
+                <select
+                  id="task-sort-order"
+                  value={sortOrder}
+                  onChange={(e) =>
+                    handleSortOrderChange(e.target.value as "ASC" | "DESC")
+                  }
+                  className="mt-2 w-full border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-zinc-200 outline-none transition focus:border-zinc-500"
+                >
+                  <option value="DESC">Descending</option>
+                  <option value="ASC">Ascending</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => setPage((current) => Math.max(1, current - 1))}
-            disabled={page <= 1}
-            className="rounded-md border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Previous
-          </button>
+          <div>
+            <p className="text-lg font-semibold text-zinc-100">Tasks</p>
 
-          <span className="text-sm text-muted-foreground">
-            Page {page} of {totalPages}
-          </span>
-
-          <button
-            type="button"
-            onClick={() =>
-              setPage((current) => Math.min(totalPages, current + 1))
-            }
-            disabled={page >= totalPages}
-            className="rounded-md border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Next
-          </button>
+            <p className="mt-1 text-sm text-zinc-500">
+              {total} {total === 1 ? "task" : "tasks"} found
+            </p>
+          </div>
         </div>
-      )}
+
+        {tasks.length === 0 ? (
+          <div className="border border-dashed border-zinc-800 bg-zinc-900/60 p-10 text-center">
+            <p className="text-sm text-zinc-500">No tasks found.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {tasks.map((task) => (
+              <Link
+                key={task.id}
+                href={`/projects/${task.project.id}/tasks/${task.id}`}
+                className="block border border-zinc-800 bg-zinc-900/80 p-5 transition hover:border-zinc-700 hover:bg-zinc-900"
+              >
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div className="min-w-0">
+                    <div className="flex items-start gap-3">
+                      <h2 className="min-w-0 truncate text-base font-semibold text-zinc-100">
+                        {task.title}
+                      </h2>
+                    </div>
+
+                    {task.description && (
+                      <p className="mt-2 line-clamp-2 text-sm leading-6 text-zinc-500">
+                        {task.description}
+                      </p>
+                    )}
+
+                    <p className="mt-3 text-xs text-zinc-600">
+                      Project: {task.project.name}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 text-xs">
+                    <span className="border border-zinc-700 bg-zinc-950 px-2.5 py-1.5 font-medium text-zinc-400">
+                      {task.status}
+                    </span>
+
+                    <span className="border border-zinc-700 bg-zinc-950 px-2.5 py-1.5 font-medium text-zinc-400">
+                      {task.priority}
+                    </span>
+
+                    <span className="border border-zinc-700 bg-zinc-950 px-2.5 py-1.5 font-medium text-zinc-400">
+                      {task.assignee?.name ?? "Unassigned"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex items-center justify-between border-t border-zinc-800 pt-3">
+                  <span className="text-xs text-zinc-600">
+                    Due: {formatDueDate(task.dueDate)}
+                  </span>
+
+                  <span className="text-xs font-medium text-zinc-600 transition group-hover:text-zinc-300">
+                    View task →
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between border-t border-zinc-800 pt-5">
+            <button
+              type="button"
+              onClick={() => setPage((current) => Math.max(1, current - 1))}
+              disabled={page <= 1}
+              className="border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-300 transition hover:border-zinc-600 hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Previous
+            </button>
+
+            <span className="text-sm text-zinc-500">
+              Page {page} of {totalPages}
+            </span>
+
+            <button
+              type="button"
+              onClick={() =>
+                setPage((current) => Math.min(totalPages, current + 1))
+              }
+              disabled={page >= totalPages}
+              className="border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-300 transition hover:border-zinc-600 hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Next
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
