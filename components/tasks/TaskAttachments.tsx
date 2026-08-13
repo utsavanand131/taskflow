@@ -226,29 +226,37 @@ export default function TaskAttachments({
   }
 
   return (
-    <div className="rounded-xl border p-6 space-y-6">
-      <h2 className="text-xl font-semibold">Attachments</h2>
+    <div className="border border-zinc-800 bg-zinc-900/80 p-6">
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold text-zinc-100">Attachments</h2>
+
+        <p className="mt-1 text-sm text-zinc-500">
+          Files connected to this task.
+        </p>
+      </div>
 
       <div className="space-y-3">
         {attachments.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No attachments yet.</p>
+          <div className="border border-dashed border-zinc-800 p-6 text-center">
+            <p className="text-sm text-zinc-500">No attachments yet.</p>
+          </div>
         ) : (
           attachments.map((attachment) => (
             <div
               key={attachment.id}
-              className="flex items-center justify-between gap-4 rounded-lg border p-4"
+              className="flex flex-col gap-4 border border-zinc-800 bg-zinc-950 p-4 sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="min-w-0">
                 <a
                   href={attachment.fileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block truncate text-sm font-medium hover:underline"
+                  className="block truncate text-sm font-medium text-zinc-200 transition hover:text-zinc-100 hover:underline"
                 >
                   {attachment.fileName}
                 </a>
 
-                <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-zinc-600">
                   {attachment.fileSize ? (
                     <span>{formatFileSize(attachment.fileSize)}</span>
                   ) : null}
@@ -265,38 +273,58 @@ export default function TaskAttachments({
                 type="button"
                 onClick={() => handleDelete(attachment.id)}
                 disabled={deleting}
-                className="shrink-0 rounded-md border px-3 py-1.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+                className="w-full border border-zinc-700 px-3 py-2 text-sm font-medium text-zinc-400 transition hover:border-red-900 hover:bg-red-950/30 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
               >
-                Delete
+                {deleting ? "Deleting..." : "Delete"}
               </button>
             </div>
           ))
         )}
       </div>
 
-      <div className="space-y-3 border-t pt-4">
+      <div className="mt-6 space-y-4 border-t border-zinc-800 pt-5">
+        <div>
+          <label className="text-sm font-medium text-zinc-300">
+            Upload file
+          </label>
+
+          <p className="mt-1 text-xs text-zinc-600">
+            Maximum file size: 10 MB.
+          </p>
+        </div>
+
         <input
           ref={fileInputRef}
           type="file"
           onChange={handleFileChange}
           disabled={uploading}
-          className="block w-full text-sm"
+          className="block w-full border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-400 file:mr-4 file:border-0 file:bg-zinc-800 file:px-3 file:py-2 file:text-sm file:font-medium file:text-zinc-200 hover:file:bg-zinc-700"
         />
 
         {selectedFile && (
-          <p className="text-sm text-muted-foreground">
-            Selected: {selectedFile.name} ({formatFileSize(selectedFile.size)})
-          </p>
+          <div className="border border-zinc-800 bg-zinc-950 p-3">
+            <p className="text-sm text-zinc-300">
+              Selected: {selectedFile.name}
+            </p>
+
+            <p className="mt-1 text-xs text-zinc-600">
+              {formatFileSize(selectedFile.size)}
+            </p>
+          </div>
         )}
 
-        {error && <p className="text-sm text-red-500">{error}</p>}
+        {error && (
+          <p className="border border-red-900 bg-red-950/30 p-3 text-sm text-red-400">
+            {error}
+          </p>
+        )}
 
         <div className="flex justify-end">
           <button
             type="button"
             onClick={handleUpload}
             disabled={!selectedFile || uploading}
-            className="rounded-lg border px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+            className="border border-zinc-700 bg-zinc-950 px-4 py-2 text-sm font-medium text-zinc-200 transition hover:border-zinc-600 hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {uploading ? "Uploading..." : "Upload Attachment"}
           </button>
