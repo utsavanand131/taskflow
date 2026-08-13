@@ -73,19 +73,6 @@ export default function TaskComments({
     DELETE_COMMENT_MUTATION,
   );
 
-  async function refreshWhilePreservingScroll() {
-    const scrollPosition = window.scrollY;
-
-    await onCommentAdded();
-
-    requestAnimationFrame(() => {
-      window.scrollTo({
-        top: scrollPosition,
-        behavior: "auto",
-      });
-    });
-  }
-
   async function handleSubmit() {
     const trimmedContent = content.trim();
 
@@ -102,7 +89,7 @@ export default function TaskComments({
 
     setContent("");
 
-    await refreshWhilePreservingScroll();
+    await onCommentAdded();
   }
 
   function handleEdit(comment: Comment) {
@@ -132,7 +119,7 @@ export default function TaskComments({
     setEditingCommentId(null);
     setEditContent("");
 
-    await refreshWhilePreservingScroll();
+    await onCommentAdded();
   }
 
   async function handleDelete(commentId: string) {
@@ -150,7 +137,7 @@ export default function TaskComments({
       },
     });
 
-    await refreshWhilePreservingScroll();
+    await onCommentAdded();
   }
 
   return (

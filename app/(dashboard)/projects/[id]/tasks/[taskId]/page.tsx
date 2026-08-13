@@ -225,13 +225,31 @@ export default function TaskDetailsPage() {
 
   const taskId = params.taskId as string;
 
-  const { data, loading, error, refetch } = useQuery<TaskResponse>(TASK_QUERY, {
+  const {
+    data,
+    loading,
+    error,
+    refetch: refetchTask,
+  } = useQuery<TaskResponse>(TASK_QUERY, {
     variables: {
       id: taskId,
     },
   });
 
   const [updateTask] = useMutation(UPDATE_TASK_MUTATION);
+
+  async function refetchTaskPreservingScroll() {
+    const scrollPosition = window.scrollY;
+
+    await refetchTask();
+
+    requestAnimationFrame(() => {
+      window.scrollTo({
+        top: scrollPosition,
+        behavior: "auto",
+      });
+    });
+  }
 
   async function handleStatusChange(status: string) {
     await updateTask({
@@ -243,7 +261,7 @@ export default function TaskDetailsPage() {
       },
     });
 
-    await refetch();
+    await refetchTaskPreservingScroll();
   }
 
   async function handlePriorityChange(priority: string) {
@@ -256,7 +274,7 @@ export default function TaskDetailsPage() {
       },
     });
 
-    await refetch();
+    await refetchTaskPreservingScroll();
   }
 
   async function handleDueDateChange(dueDate: string) {
@@ -269,7 +287,7 @@ export default function TaskDetailsPage() {
       },
     });
 
-    await refetch();
+    await refetchTaskPreservingScroll();
   }
 
   if (loading) {
@@ -324,6 +342,7 @@ export default function TaskDetailsPage() {
                 <p className="text-xs uppercase tracking-wide text-zinc-600">
                   Project
                 </p>
+
                 <p className="mt-1 text-sm text-zinc-300">
                   {task.project.name}
                 </p>
@@ -333,6 +352,7 @@ export default function TaskDetailsPage() {
                 <p className="text-xs uppercase tracking-wide text-zinc-600">
                   Created
                 </p>
+
                 <p className="mt-1 text-sm text-zinc-300">
                   {new Date(Number(task.createdAt)).toLocaleDateString()}
                 </p>
@@ -352,7 +372,7 @@ export default function TaskDetailsPage() {
               assignee={task.assignee ?? null}
               owner={task.project.owner}
               team={task.project.team}
-              onAssigneeChanged={() => refetch()}
+              onAssigneeChanged={() => refetchTaskPreservingScroll()}
             />
 
             <div className="grid gap-5 md:grid-cols-3">
@@ -426,25 +446,25 @@ export default function TaskDetailsPage() {
         <TaskLabels
           taskId={task.id}
           labels={task.labels}
-          onLabelsChanged={() => refetch()}
+          onLabelsChanged={() => refetchTaskPreservingScroll()}
         />
 
         <TaskChecklist
           taskId={task.id}
           checklist={task.checklist}
-          onChecklistChanged={() => refetch()}
+          onChecklistChanged={() => refetchTaskPreservingScroll()}
         />
 
         <TaskAttachments
           taskId={task.id}
           attachments={task.attachments}
-          onAttachmentsChanged={() => refetch()}
+          onAttachmentsChanged={() => refetchTaskPreservingScroll()}
         />
 
         <TaskComments
           taskId={task.id}
           comments={task.comments}
-          onCommentAdded={() => refetch()}
+          onCommentAdded={() => refetchTaskPreservingScroll()}
         />
 
         <ActivityTimeline activities={data.activities} />
