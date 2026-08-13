@@ -73,6 +73,19 @@ export default function TaskComments({
     DELETE_COMMENT_MUTATION,
   );
 
+  async function refreshWhilePreservingScroll() {
+    const scrollPosition = window.scrollY;
+
+    await onCommentAdded();
+
+    requestAnimationFrame(() => {
+      window.scrollTo({
+        top: scrollPosition,
+        behavior: "auto",
+      });
+    });
+  }
+
   async function handleSubmit() {
     const trimmedContent = content.trim();
 
@@ -89,7 +102,7 @@ export default function TaskComments({
 
     setContent("");
 
-    await onCommentAdded();
+    await refreshWhilePreservingScroll();
   }
 
   function handleEdit(comment: Comment) {
@@ -119,7 +132,7 @@ export default function TaskComments({
     setEditingCommentId(null);
     setEditContent("");
 
-    await onCommentAdded();
+    await refreshWhilePreservingScroll();
   }
 
   async function handleDelete(commentId: string) {
@@ -137,34 +150,47 @@ export default function TaskComments({
       },
     });
 
-    await onCommentAdded();
+    await refreshWhilePreservingScroll();
   }
 
   return (
-    <div className="rounded-xl border p-6 space-y-6">
-      <h2 className="text-xl font-semibold">Comments</h2>
+    <div className="border border-zinc-800 bg-zinc-900/80 p-6">
+      <div className="mb-6 border-b border-zinc-800 pb-5">
+        <h2 className="text-lg font-semibold text-zinc-100">Comments</h2>
 
-      <div className="space-y-4">
+        <p className="mt-1 text-sm text-zinc-500">
+          Discuss updates and progress on this task.
+        </p>
+      </div>
+
+      <div className="space-y-3">
         {comments.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No comments yet.</p>
+          <div className="border border-dashed border-zinc-800 p-6 text-center">
+            <p className="text-sm text-zinc-500">No comments yet.</p>
+          </div>
         ) : (
           comments.map((comment) => (
-            <div key={comment.id} className="rounded-lg border p-4">
-              <div className="flex items-center justify-between gap-4">
-                <p className="text-sm font-medium">{comment.author.name}</p>
+            <div
+              key={comment.id}
+              className="border border-zinc-800 bg-zinc-950 p-4"
+            >
+              <div className="flex flex-col gap-2 border-b border-zinc-800 pb-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm font-medium text-zinc-200">
+                  {comment.author.name}
+                </p>
 
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-zinc-600">
                   {new Date(Number(comment.createdAt)).toLocaleString()}
                 </p>
               </div>
 
               {editingCommentId === comment.id ? (
-                <div className="mt-3 space-y-3">
+                <div className="mt-4 space-y-3">
                   <textarea
                     value={editContent}
                     onChange={(e) => setEditContent(e.target.value)}
                     rows={3}
-                    className="w-full resize-none rounded-lg border p-3 text-sm outline-none"
+                    className="w-full resize-none border border-zinc-700 bg-zinc-900 p-3 text-sm text-zinc-200 outline-none placeholder:text-zinc-600 transition focus:border-zinc-500"
                   />
 
                   <div className="flex justify-end gap-2">
@@ -172,7 +198,7 @@ export default function TaskComments({
                       type="button"
                       onClick={handleCancelEdit}
                       disabled={updatingComment}
-                      className="rounded-lg border px-3 py-1.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+                      className="border border-zinc-700 px-3 py-1.5 text-sm text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       Cancel
                     </button>
@@ -181,7 +207,7 @@ export default function TaskComments({
                       type="button"
                       onClick={() => handleUpdate(comment.id)}
                       disabled={updatingComment || !editContent.trim()}
-                      className="rounded-lg border px-3 py-1.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+                      className="border border-zinc-600 bg-zinc-800 px-3 py-1.5 text-sm font-medium text-zinc-100 transition hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {updatingComment ? "Saving..." : "Save"}
                     </button>
@@ -189,13 +215,15 @@ export default function TaskComments({
                 </div>
               ) : (
                 <>
-                  <p className="mt-2 text-sm">{comment.content}</p>
+                  <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-zinc-300">
+                    {comment.content}
+                  </p>
 
-                  <div className="mt-3 flex gap-3">
+                  <div className="mt-4 flex gap-4">
                     <button
                       type="button"
                       onClick={() => handleEdit(comment)}
-                      className="text-xs font-medium text-muted-foreground hover:text-foreground"
+                      className="text-xs font-medium text-zinc-500 transition hover:text-zinc-200"
                     >
                       Edit
                     </button>
@@ -204,9 +232,9 @@ export default function TaskComments({
                       type="button"
                       onClick={() => handleDelete(comment.id)}
                       disabled={deletingComment}
-                      className="text-xs font-medium text-muted-foreground hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                      className="text-xs font-medium text-zinc-500 transition hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      Delete
+                      {deletingComment ? "Deleting..." : "Delete"}
                     </button>
                   </div>
                 </>
@@ -216,21 +244,29 @@ export default function TaskComments({
         )}
       </div>
 
-      <div className="space-y-3">
+      <div className="mt-6 border-t border-zinc-800 pt-5">
+        <div>
+          <p className="text-sm font-medium text-zinc-300">Add a comment</p>
+
+          <p className="mt-1 text-xs text-zinc-600">
+            Share an update or note about this task.
+          </p>
+        </div>
+
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Write a comment..."
-          rows={3}
-          className="w-full resize-none rounded-lg border p-3 text-sm outline-none"
+          rows={4}
+          className="mt-4 w-full resize-none border border-zinc-700 bg-zinc-950 p-3 text-sm text-zinc-200 outline-none placeholder:text-zinc-600 transition focus:border-zinc-500"
         />
 
-        <div className="flex justify-end">
+        <div className="mt-3 flex justify-end">
           <button
             type="button"
             onClick={handleSubmit}
             disabled={addingComment || !content.trim()}
-            className="rounded-lg border px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+            className="border border-zinc-700 bg-zinc-950 px-4 py-2 text-sm font-medium text-zinc-200 transition hover:border-zinc-600 hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {addingComment ? "Adding..." : "Add Comment"}
           </button>
