@@ -54,6 +54,7 @@ export default function Navbar({ setMobileOpen }: NavbarProps) {
   const pathname = usePathname();
 
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [pageTitle, setPageTitle] = useState("Dashboard");
 
   const notificationRef = useRef<HTMLDivElement>(null);
 
@@ -96,7 +97,9 @@ export default function Navbar({ setMobileOpen }: NavbarProps) {
     return "Dashboard";
   }
 
-  const pageTitle = getPageTitle();
+  useEffect(() => {
+    setPageTitle(getPageTitle());
+  }, [pathname]);
 
   useEffect(() => {
     if (realtimeNotifications.length > 0) {
