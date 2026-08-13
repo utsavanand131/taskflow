@@ -165,34 +165,44 @@ export default function TaskChecklist({
     await onChecklistChanged();
   }
 
+  const completedCount = checklist.filter((item) => item.completed).length;
+
   return (
-    <div className="rounded-xl border p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Checklist</h2>
+    <div className="border border-zinc-800 bg-zinc-900/80 p-6">
+      <div className="flex flex-col gap-2 border-b border-zinc-800 pb-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-zinc-100">Checklist</h2>
+
+          <p className="mt-1 text-sm text-zinc-500">
+            Break this task into smaller steps.
+          </p>
+        </div>
 
         {checklist.length > 0 && (
-          <span className="text-sm text-muted-foreground">
-            {checklist.filter((item) => item.completed).length}/
-            {checklist.length} completed
+          <span className="border border-zinc-700 bg-zinc-950 px-3 py-1 text-xs font-medium text-zinc-400">
+            {completedCount}/{checklist.length} completed
           </span>
         )}
       </div>
 
-      <div className="space-y-3">
+      <div className="mt-5 space-y-3">
         {checklist.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            No checklist items yet.
-          </p>
+          <div className="border border-dashed border-zinc-800 p-6 text-center">
+            <p className="text-sm text-zinc-500">No checklist items yet.</p>
+          </div>
         ) : (
           checklist.map((item) => (
-            <div key={item.id} className="rounded-lg border p-4">
+            <div
+              key={item.id}
+              className="border border-zinc-800 bg-zinc-950 p-4"
+            >
               {editingItemId === item.id ? (
                 <div className="space-y-3">
                   <input
                     type="text"
                     value={editContent}
                     onChange={(e) => setEditContent(e.target.value)}
-                    className="w-full rounded-lg border px-3 py-2 text-sm outline-none"
+                    className="w-full border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 outline-none transition focus:border-zinc-500"
                   />
 
                   <div className="flex justify-end gap-2">
@@ -200,7 +210,7 @@ export default function TaskChecklist({
                       type="button"
                       onClick={handleCancelEdit}
                       disabled={updating}
-                      className="rounded-lg border px-3 py-1.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+                      className="border border-zinc-700 px-3 py-1.5 text-sm text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       Cancel
                     </button>
@@ -209,7 +219,7 @@ export default function TaskChecklist({
                       type="button"
                       onClick={() => handleUpdate(item.id)}
                       disabled={updating || !editContent.trim()}
-                      className="rounded-lg border px-3 py-1.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+                      className="border border-zinc-600 bg-zinc-800 px-3 py-1.5 text-sm font-medium text-zinc-100 transition hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {updating ? "Saving..." : "Save"}
                     </button>
@@ -222,31 +232,31 @@ export default function TaskChecklist({
                       type="checkbox"
                       checked={item.completed}
                       onChange={() => handleToggle(item.id)}
-                      className="mt-1 h-4 w-4 cursor-pointer"
+                      className="mt-1 h-4 w-4 cursor-pointer accent-zinc-300"
                     />
 
                     <div className="min-w-0 flex-1">
                       <p
-                        className={`text-sm ${
+                        className={`text-sm leading-6 ${
                           item.completed
-                            ? "text-muted-foreground line-through"
-                            : ""
+                            ? "text-zinc-600 line-through"
+                            : "text-zinc-200"
                         }`}
                       >
                         {item.content}
                       </p>
 
-                      <p className="mt-1 text-xs text-muted-foreground">
+                      <p className="mt-1 text-xs text-zinc-600">
                         Added by {item.createdBy.name}
                       </p>
                     </div>
                   </div>
 
-                  <div className="mt-3 flex gap-3 pl-7">
+                  <div className="mt-3 flex gap-4 pl-7">
                     <button
                       type="button"
                       onClick={() => handleEdit(item)}
-                      className="text-xs font-medium text-muted-foreground hover:text-foreground"
+                      className="text-xs font-medium text-zinc-500 transition hover:text-zinc-200"
                     >
                       Edit
                     </button>
@@ -255,7 +265,7 @@ export default function TaskChecklist({
                       type="button"
                       onClick={() => handleDelete(item.id)}
                       disabled={deleting}
-                      className="text-xs font-medium text-muted-foreground hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                      className="text-xs font-medium text-zinc-500 transition hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       Delete
                     </button>
@@ -267,20 +277,20 @@ export default function TaskChecklist({
         )}
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="mt-5 flex flex-col gap-3 border-t border-zinc-800 pt-5 sm:flex-row">
         <input
           type="text"
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Add a checklist item..."
-          className="flex-1 rounded-lg border px-3 py-2 text-sm outline-none"
+          className="flex-1 border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-200 outline-none placeholder:text-zinc-600 transition focus:border-zinc-500"
         />
 
         <button
           type="button"
           onClick={handleAdd}
           disabled={adding || !content.trim()}
-          className="rounded-lg border px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+          className="border border-zinc-700 bg-zinc-950 px-4 py-2 text-sm font-medium text-zinc-200 transition hover:border-zinc-600 hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {adding ? "Adding..." : "Add Item"}
         </button>
