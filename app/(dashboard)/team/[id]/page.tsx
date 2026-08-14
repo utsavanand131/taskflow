@@ -215,139 +215,188 @@ export default function TeamDetailsPage() {
   }
 
   if (loading) {
-    return <div>Loading team...</div>;
+    return (
+      <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 p-6 text-zinc-400">
+        Loading team...
+      </div>
+    );
   }
 
   if (error) {
-    return <div>{error.message}</div>;
+    return (
+      <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 p-6 text-red-400">
+        {error.message}
+      </div>
+    );
   }
 
   if (!data?.team) {
-    return <div>Team not found.</div>;
+    return (
+      <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 p-6 text-zinc-400">
+        Team not found.
+      </div>
+    );
   }
 
   const team = data.team;
 
   return (
-    <div className="space-y-6">
-      <div>
+    <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 px-4 py-6 text-zinc-100 md:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl space-y-6">
         <Link
           href="/team"
-          className="text-sm text-gray-500 hover:text-gray-900"
+          className="inline-flex text-sm text-zinc-500 transition hover:text-zinc-200"
         >
           ← Back to Teams
         </Link>
-      </div>
 
-      <div className="rounded-xl border p-6">
-        <h1 className="text-2xl font-bold">{team.name}</h1>
-
-        {team.description && (
-          <p className="mt-2 text-sm text-gray-500">{team.description}</p>
-        )}
-
-        <p className="mt-4 text-sm text-gray-500">
-          Created: {new Date(Number(team.createdAt)).toLocaleDateString()}
-        </p>
-      </div>
-
-      <div className="rounded-xl border p-6">
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold">Invite Member</h2>
-
-          <p className="mt-1 text-sm text-gray-500">
-            Invite an existing TaskFlow user by email.
+        <section className="border border-zinc-800 bg-zinc-900/80 p-6">
+          <p className="text-xs uppercase tracking-[0.2em] text-zinc-600">
+            Team
           </p>
-        </div>
 
-        <form
-          onSubmit={handleInvite}
-          className="flex flex-col gap-3 sm:flex-row"
-        >
-          <input
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="member@example.com"
-            className="flex-1 rounded-lg border px-3 py-2 outline-none focus:ring-2"
-            required
-          />
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-100 md:text-3xl">
+            {team.name}
+          </h1>
 
-          <button
-            type="submit"
-            disabled={inviting || !email.trim()}
-            className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+          {team.description && (
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-400">
+              {team.description}
+            </p>
+          )}
+
+          <div className="mt-6 grid gap-4 border-t border-zinc-800 pt-5 sm:grid-cols-2">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-zinc-600">
+                Members
+              </p>
+
+              <p className="mt-1 text-sm text-zinc-300">
+                {team.members.length}{" "}
+                {team.members.length === 1 ? "member" : "members"}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs uppercase tracking-wide text-zinc-600">
+                Created
+              </p>
+
+              <p className="mt-1 text-sm text-zinc-300">
+                {new Date(Number(team.createdAt)).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="border border-zinc-800 bg-zinc-900/80 p-6">
+          <div className="mb-5">
+            <h2 className="text-lg font-semibold text-zinc-100">
+              Invite Member
+            </h2>
+
+            <p className="mt-1 text-sm text-zinc-500">
+              Invite an existing TaskFlow user by email.
+            </p>
+          </div>
+
+          <form
+            onSubmit={handleInvite}
+            className="flex flex-col gap-3 sm:flex-row"
           >
-            {inviting ? "Sending..." : "Invite Member"}
-          </button>
-        </form>
+            <input
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="member@example.com"
+              className="flex-1 border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-zinc-200 outline-none placeholder:text-zinc-600 transition focus:border-zinc-500"
+              required
+            />
 
-        {inviteMessage && (
-          <p className="mt-3 text-sm text-green-600">{inviteMessage}</p>
-        )}
+            <button
+              type="submit"
+              disabled={inviting || !email.trim()}
+              className="border border-zinc-700 bg-zinc-950 px-4 py-2.5 text-sm font-medium text-zinc-200 transition hover:border-zinc-600 hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {inviting ? "Sending..." : "Invite Member"}
+            </button>
+          </form>
 
-        {inviteError && (
-          <p className="mt-3 text-sm text-red-600">{inviteError.message}</p>
-        )}
-      </div>
+          {inviteMessage && (
+            <p className="mt-3 border border-emerald-900 bg-emerald-950/30 p-3 text-sm text-emerald-400">
+              {inviteMessage}
+            </p>
+          )}
 
-      <div className="rounded-xl border">
-        <div className="border-b p-5">
-          <h2 className="text-lg font-semibold">Members</h2>
+          {inviteError && (
+            <p className="mt-3 border border-red-900 bg-red-950/30 p-3 text-sm text-red-400">
+              {inviteError.message}
+            </p>
+          )}
+        </section>
 
-          <p className="mt-1 text-sm text-gray-500">
-            {team.members.length}{" "}
-            {team.members.length === 1 ? "member" : "members"}
-          </p>
-        </div>
+        <section className="border border-zinc-800 bg-zinc-900/80">
+          <div className="border-b border-zinc-800 p-5">
+            <h2 className="text-lg font-semibold text-zinc-100">Members</h2>
 
-        <div>
-          {team.members.map((member) => {
-            const isOwner = member.role === "OWNER";
+            <p className="mt-1 text-sm text-zinc-500">
+              Manage people who belong to this team.
+            </p>
+          </div>
 
-            return (
-              <div
-                key={member.id}
-                className="flex flex-col gap-4 border-b p-5 last:border-b-0 sm:flex-row sm:items-center sm:justify-between"
-              >
-                <div>
-                  <p className="font-medium">{member.user.name}</p>
+          <div>
+            {team.members.map((member) => {
+              const isOwner = member.role === "OWNER";
 
-                  <p className="text-sm text-gray-500">{member.user.email}</p>
-                </div>
+              return (
+                <div
+                  key={member.id}
+                  className="flex flex-col gap-4 border-b border-zinc-800 p-5 last:border-b-0 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="min-w-0">
+                    <p className="font-medium text-zinc-200">
+                      {member.user.name}
+                    </p>
 
-                {isOwner ? (
-                  <span className="w-fit rounded-full border px-3 py-1 text-xs">
-                    OWNER
-                  </span>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <select
-                      value={member.role}
-                      onChange={(event) =>
-                        handleRoleChange(member.user.id, event.target.value)
-                      }
-                      disabled={updatingRole || removingMember}
-                      className="rounded-lg border px-3 py-2 text-sm"
-                    >
-                      <option value="MEMBER">MEMBER</option>
-
-                      <option value="ADMIN">ADMIN</option>
-                    </select>
-
-                    <button
-                      onClick={() => handleRemoveMember(member.user.id)}
-                      disabled={updatingRole || removingMember}
-                      className="rounded-lg border px-3 py-2 text-sm text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {removingMember ? "Removing..." : "Remove"}
-                    </button>
+                    <p className="mt-1 text-sm text-zinc-500">
+                      {member.user.email}
+                    </p>
                   </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+
+                  {isOwner ? (
+                    <span className="w-fit border border-zinc-700 bg-zinc-950 px-3 py-1.5 text-xs font-medium text-zinc-400">
+                      OWNER
+                    </span>
+                  ) : (
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                      <select
+                        value={member.role}
+                        onChange={(event) =>
+                          handleRoleChange(member.user.id, event.target.value)
+                        }
+                        disabled={updatingRole || removingMember}
+                        className="border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-200 outline-none transition focus:border-zinc-500"
+                      >
+                        <option value="MEMBER">MEMBER</option>
+
+                        <option value="ADMIN">ADMIN</option>
+                      </select>
+
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveMember(member.user.id)}
+                        disabled={updatingRole || removingMember}
+                        className="border border-zinc-700 px-3 py-2 text-sm font-medium text-zinc-400 transition hover:border-red-900 hover:bg-red-950/30 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {removingMember ? "Removing..." : "Remove"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
       </div>
     </div>
   );
