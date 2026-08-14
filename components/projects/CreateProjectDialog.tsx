@@ -2,8 +2,17 @@
 
 import { useState } from "react";
 import { gql } from "@apollo/client";
-import { useMutation } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { X } from "lucide-react";
+
+const TEAMS_QUERY = gql`
+  query TeamsForProject {
+    teams {
+      id
+      name
+    }
+  }
+`;
 
 const CREATE_PROJECT_MUTATION = gql`
   mutation CreateProject($input: CreateProjectInput!) {
@@ -14,12 +23,23 @@ const CREATE_PROJECT_MUTATION = gql`
       color
       status
       createdAt
+      team {
+        id
+        name
+      }
     }
   }
 `;
 
 interface CreateProjectDialogProps {
   onCreated: () => void;
+}
+
+interface TeamsResponse {
+  teams: {
+    id: string;
+    name: string;
+  }[];
 }
 
 export default function CreateProjectDialog({
@@ -31,7 +51,11 @@ export default function CreateProjectDialog({
     name: "",
     description: "",
     color: "#6366f1",
+    teamId: "",
   });
+
+  const { data: teamsData, loading: teamsLoading } =
+    useQuery<TeamsResponse>(TEAMS_QUERY);
 
   const [createProject, { loading }] = useMutation(CREATE_PROJECT_MUTATION);
 
@@ -40,7 +64,12 @@ export default function CreateProjectDialog({
 
     await createProject({
       variables: {
-        input: form,
+        input: {
+          name: form.name,
+          description: form.description,
+          color: form.color,
+          teamId: form.teamId || undefined,
+        },
       },
     });
 
@@ -48,6 +77,7 @@ export default function CreateProjectDialog({
       name: "",
       description: "",
       color: "#6366f1",
+      teamId: "",
     });
 
     setOpen(false);
@@ -145,6 +175,43 @@ export default function CreateProjectDialog({
                   rows={4}
                   className="mt-2 w-full resize-none border border-zinc-700 bg-zinc-900 px-3 py-2.5 text-sm text-zinc-200 outline-none placeholder:text-zinc-600 transition focus:border-zinc-500"
                 />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="project-team"
+                  className="text-sm font-medium text-zinc-300"
+                >
+                  Team
+                </label>
+
+                <select
+                  id="project-team"
+                  value={form.teamId}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      teamId: e.target.value,
+                    })
+                  }
+                  disabled={teamsLoading}
+                  className="mt-2 w-full border border-zinc-700 bg-zinc-900 px-3 py-2.5 text-sm text-zinc-200 outline-none transition focus:border-zinc-500"
+                >
+                  <option value="">
+                    {teamsLoading ? "Loading teams..." : "No team"}
+                  </option>
+
+                  {teamsData?.teams.map((team) => (
+                    <option key={team.id} value={team.id}>
+                      {team.name}
+                    </option>
+                  ))}
+                </select>
+
+                <p className="mt-1 text-xs text-zinc-600">
+                  Link this project to a team so team members can collaborate
+                  and be assigned tasks.
+                </p>
               </div>
 
               <div>
