@@ -105,97 +105,118 @@ export default function InvitationsPage() {
   }
 
   if (loading) {
-    return <div>Loading invitations...</div>;
+    return (
+      <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 p-6 text-zinc-400">
+        Loading invitations...
+      </div>
+    );
   }
 
   if (error) {
-    return <div>{error.message}</div>;
+    return (
+      <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 p-6 text-red-400">
+        {error.message}
+      </div>
+    );
   }
 
   const invitations = data?.myInvitations ?? [];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 px-4 py-6 text-zinc-100 md:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl space-y-6">
         <div>
           <Link
             href="/team"
-            className="text-sm text-gray-500 hover:text-gray-900"
+            className="inline-flex text-sm text-zinc-500 transition hover:text-zinc-200"
           >
             ← Back to Teams
           </Link>
 
-          <p className="mt-4 text-sm text-gray-500">
+          <p className="mt-4 text-sm text-zinc-400">
             Review invitations to join teams.
           </p>
         </div>
-      </div>
 
-      {invitations.length === 0 ? (
-        <div className="rounded-xl border p-8 text-center">
-          <h2 className="text-lg font-semibold">No pending invitations</h2>
+        {invitations.length === 0 ? (
+          <div className="border border-dashed border-zinc-800 bg-zinc-900/60 p-10 text-center">
+            <h2 className="text-lg font-semibold text-zinc-100">
+              No pending invitations
+            </h2>
 
-          <p className="mt-2 text-sm text-gray-500">
-            You don't have any team invitations right now.
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {invitations.map((invitation) => (
-            <div key={invitation.id} className="rounded-xl border p-5">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h2 className="text-lg font-semibold">
-                    {invitation.team.name}
-                  </h2>
-
-                  {invitation.team.description && (
-                    <p className="mt-1 text-sm text-gray-500">
-                      {invitation.team.description}
+            <p className="mt-2 text-sm text-zinc-500">
+              You don't have any team invitations right now.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {invitations.map((invitation) => (
+              <div
+                key={invitation.id}
+                className="border border-zinc-800 bg-zinc-900/80 p-5"
+              >
+                <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="min-w-0">
+                    <p className="text-xs uppercase tracking-[0.15em] text-zinc-600">
+                      Team Invitation
                     </p>
-                  )}
 
-                  <p className="mt-3 text-sm text-gray-600">
-                    Invited by{" "}
-                    <span className="font-medium">
-                      {invitation.invitedBy.name}
-                    </span>
-                  </p>
+                    <h2 className="mt-2 text-xl font-semibold text-zinc-100">
+                      {invitation.team.name}
+                    </h2>
 
-                  <p className="text-sm text-gray-500">
-                    {invitation.invitedBy.email}
-                  </p>
+                    {invitation.team.description && (
+                      <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">
+                        {invitation.team.description}
+                      </p>
+                    )}
 
-                  <p className="mt-2 text-xs text-gray-400">
-                    Invited on{" "}
-                    {new Date(
-                      Number(invitation.createdAt),
-                    ).toLocaleDateString()}
-                  </p>
-                </div>
+                    <div className="mt-5 space-y-1">
+                      <p className="text-sm text-zinc-400">
+                        Invited by{" "}
+                        <span className="font-medium text-zinc-200">
+                          {invitation.invitedBy.name}
+                        </span>
+                      </p>
 
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleAccept(invitation.id)}
-                    disabled={accepting || rejecting}
-                    className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {accepting ? "Accepting..." : "Accept"}
-                  </button>
+                      <p className="text-xs text-zinc-600">
+                        {invitation.invitedBy.email}
+                      </p>
 
-                  <button
-                    onClick={() => handleReject(invitation.id)}
-                    disabled={accepting || rejecting}
-                    className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {rejecting ? "Rejecting..." : "Reject"}
-                  </button>
+                      <p className="pt-1 text-xs text-zinc-600">
+                        Invited on{" "}
+                        {new Date(
+                          Number(invitation.createdAt),
+                        ).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto">
+                    <button
+                      type="button"
+                      onClick={() => handleAccept(invitation.id)}
+                      disabled={accepting || rejecting}
+                      className="border border-zinc-600 bg-zinc-800 px-5 py-2.5 text-sm font-medium text-zinc-100 transition hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {accepting ? "Accepting..." : "Accept"}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleReject(invitation.id)}
+                      disabled={accepting || rejecting}
+                      className="border border-zinc-700 bg-zinc-950 px-5 py-2.5 text-sm font-medium text-zinc-400 transition hover:border-red-900 hover:bg-red-950/30 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {rejecting ? "Rejecting..." : "Reject"}
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
