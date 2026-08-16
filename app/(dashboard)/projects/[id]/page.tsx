@@ -9,7 +9,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 import CreateTaskDialog from "@/components/tasks/CreateTaskDialog";
 import KanbanColumn from "@/components/tasks/KanbanColumn";
@@ -51,6 +51,12 @@ const UPDATE_TASK_MUTATION = gql`
   }
 `;
 
+const DELETE_PROJECT_MUTATION = gql`
+  mutation DeleteProject($id: ID!) {
+    deleteProject(id: $id)
+  }
+`;
+
 interface ProjectResponse {
   project: {
     id: string;
@@ -79,6 +85,7 @@ interface ProjectResponse {
 
 export default function ProjectDetailsPage() {
   const params = useParams();
+  const router = useRouter();
 
   const id = params.id as string;
 
@@ -100,6 +107,10 @@ export default function ProjectDetailsPage() {
   );
 
   const [updateTask] = useMutation(UPDATE_TASK_MUTATION);
+
+  const [deleteProject, { loading: deletingProject }] = useMutation(
+    DELETE_PROJECT_MUTATION,
+  );
 
   async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
@@ -132,6 +143,28 @@ export default function ProjectDetailsPage() {
     await refetch();
   }
 
+  async function handleDeleteProject() {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${project.name}"? This action cannot be undone.`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteProject({
+        variables: {
+          id: project.id,
+        },
+      });
+
+      router.push("/projects");
+    } catch (error) {
+      console.error("Failed to delete project:", error);
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 p-6 text-zinc-400">
@@ -162,44 +195,59 @@ export default function ProjectDetailsPage() {
     <div className="min-h-full bg-gradient-to-br from-zinc-950 via-neutral-950 to-zinc-900 px-4 py-6 text-zinc-100 md:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-6">
         <div className="border border-zinc-800 bg-zinc-900/80 p-6">
-          <div className="flex flex-wrap items-center gap-3">
-            <div
-              className="h-5 w-5 shrink-0"
-              style={{
-                backgroundColor: project.color || "#6366f1",
-              }}
-            />
+          <div className="flex flex-col gap-5">
+            <div className="flex flex-wrap items-center gap-3">
+              <div
+                className="h-5 w-5 shrink-0"
+                style={{
+                  backgroundColor: project.color || "#6366f1",
+                }}
+              />
 
-            <h1 className="text-2xl font-bold tracking-tight text-zinc-100 md:text-3xl">
-              {project.name}
-            </h1>
-          </div>
-
-          <span className="mt-4 inline-block border border-zinc-700 bg-zinc-950 px-3 py-1 text-xs font-medium text-zinc-300">
-            {project.status}
-          </span>
-
-          {project.description && (
-            <p className="mt-4 max-w-3xl text-sm leading-6 text-zinc-400">
-              {project.description}
-            </p>
-          )}
-
-          <div className="mt-6 grid gap-4 border-t border-zinc-800 pt-5 text-sm sm:grid-cols-2">
-            <div>
-              <p className="text-xs uppercase tracking-wide text-zinc-600">
-                Owner
-              </p>
-              <p className="mt-1 text-zinc-300">{project.owner.name}</p>
+              <h1 className="text-2xl font-bold tracking-tight text-zinc-100 md:text-3xl">
+                {project.name}
+              </h1>
             </div>
 
-            <div>
-              <p className="text-xs uppercase tracking-wide text-zinc-600">
-                Created
+            <span className="inline-block w-fit border border-zinc-700 bg-zinc-950 px-3 py-1 text-xs font-medium text-zinc-300">
+              {project.status}
+            </span>
+
+            {project.description && (
+              <p className="max-w-3xl text-sm leading-6 text-zinc-400">
+                {project.description}
               </p>
-              <p className="mt-1 text-zinc-300">
-                {new Date(Number(project.createdAt)).toLocaleDateString()}
-              </p>
+            )}
+
+            <div className="grid gap-4 border-t border-zinc-800 pt-5 text-sm sm:grid-cols-2">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-zinc-600">
+                  Owner
+                </p>
+
+                <p className="mt-1 text-zinc-300">{project.owner.name}</p>
+              </div>
+
+              <div>
+                <p className="text-xs uppercase tracking-wide text-zinc-600">
+                  Created
+                </p>
+
+                <p className="mt-1 text-zinc-300">
+                  {new Date(Number(project.createdAt)).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex justify-end border-t border-zinc-800 pt-5">
+              <button
+                type="button"
+                onClick={handleDeleteProject}
+                disabled={deletingProject}
+                className="border border-red-900 bg-red-950/20 px-4 py-2 text-sm font-medium text-red-400 transition hover:bg-red-950/50 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {deletingProject ? "Deleting..." : "Delete Project"}
+              </button>
             </div>
           </div>
         </div>
