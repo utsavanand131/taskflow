@@ -2,7 +2,7 @@
 
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 import ActivityTimeline from "@/components/tasks/ActivityTimeline";
 import TaskComments from "@/components/tasks/TaskComments";
@@ -122,6 +122,12 @@ const UPDATE_TASK_MUTATION = gql`
   }
 `;
 
+const DELETE_TASK_MUTATION = gql`
+  mutation DeleteTask($id: ID!) {
+    deleteTask(id: $id)
+  }
+`;
+
 interface TaskResponse {
   task: {
     id: string;
@@ -222,6 +228,7 @@ interface TaskResponse {
 
 export default function TaskDetailsPage() {
   const params = useParams();
+  const router = useRouter();
 
   const taskId = params.taskId as string;
 
@@ -237,6 +244,9 @@ export default function TaskDetailsPage() {
   });
 
   const [updateTask] = useMutation(UPDATE_TASK_MUTATION);
+
+  const [deleteTask, { loading: deletingTask }] =
+    useMutation(DELETE_TASK_MUTATION);
 
   async function refetchTaskPreservingScroll() {
     const scrollPosition = window.scrollY;
@@ -288,6 +298,32 @@ export default function TaskDetailsPage() {
     });
 
     await refetchTaskPreservingScroll();
+  }
+
+  async function handleDeleteTask() {
+    if (!data?.task) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${data.task.title}"? This action cannot be undone.`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteTask({
+        variables: {
+          id: taskId,
+        },
+      });
+
+      router.push(`/projects/${data.task.project.id}`);
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+    }
   }
 
   if (loading) {
@@ -357,6 +393,17 @@ export default function TaskDetailsPage() {
                   {new Date(Number(task.createdAt)).toLocaleDateString()}
                 </p>
               </div>
+            </div>
+
+            <div className="flex justify-end border-t border-zinc-800 pt-5">
+              <button
+                type="button"
+                onClick={handleDeleteTask}
+                disabled={deletingTask}
+                className="border border-red-900 bg-red-950/20 px-4 py-2 text-sm font-medium text-red-400 transition hover:bg-red-950/50 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {deletingTask ? "Deleting..." : "Delete Task"}
+              </button>
             </div>
           </div>
         </section>

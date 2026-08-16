@@ -103,6 +103,7 @@ export default function ProjectDetailsPage() {
       variables: {
         id,
       },
+      fetchPolicy: "network-only",
     },
   );
 

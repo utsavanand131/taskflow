@@ -31,8 +31,12 @@ interface ProjectsResponse {
 }
 
 export default function ProjectsPage() {
-  const { data, loading, error, refetch } =
-    useQuery<ProjectsResponse>(PROJECTS_QUERY);
+  const { data, loading, error, refetch } = useQuery<ProjectsResponse>(
+    PROJECTS_QUERY,
+    {
+      fetchPolicy: "network-only",
+    },
+  );
 
   if (loading) {
     return (
