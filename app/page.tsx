@@ -8,7 +8,7 @@ import ShapeGrid from "@/components/ShapeGrid";
 export default function Home() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#08090b] text-zinc-100">
-      {/* Hero background */}
+      {/* ShapeGrid background */}
       <div className="absolute inset-0">
         <ShapeGrid
           speed={0.35}
@@ -54,20 +54,30 @@ export default function Home() {
 
         {/* Hero */}
         <section className="mx-auto flex min-h-[calc(100vh-88px)] max-w-6xl items-center justify-center px-5 py-20 text-center md:px-8">
-          <div className="max-w-4xl">
-            <div className="inline-flex border border-zinc-800 bg-black/60 px-3 py-1.5 text-xs uppercase tracking-[0.2em] text-zinc-500 backdrop-blur-sm">
-              Project management for modern teams
+          <div className="relative max-w-4xl">
+            {/* Ambient glow behind hero */}
+            <div className="pointer-events-none absolute left-1/2 top-[44%] -z-10 h-[360px] w-[620px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/[0.055] blur-[120px]" />
+
+            {/* Eyebrow glow */}
+            <div className="relative inline-flex">
+              <div className="pointer-events-none absolute -inset-4 rounded-full bg-blue-400/[0.08] blur-2xl" />
+
+              <div className="relative border border-zinc-700/80 bg-black/55 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.22em] text-zinc-300 backdrop-blur-sm sm:text-xs">
+                <span className="mr-2 text-blue-300">✦</span>
+                Project management for modern teams
+              </div>
             </div>
 
-            <h1 className="mt-8 text-5xl font-semibold leading-[0.98] tracking-[-0.04em] text-white sm:text-6xl md:text-7xl lg:text-8xl">
-              Plan.
-              <br />
-              Collaborate.
-              <br />
-              Ship.
+            {/* Hero heading */}
+            <h1 className="mt-8 font-serif text-6xl font-medium leading-[0.92] tracking-[-0.045em] text-zinc-100 sm:text-7xl md:text-8xl lg:text-[7.2rem]">
+              <span className="block">Plan.</span>
+
+              <span className="block text-zinc-300">Collaborate.</span>
+
+              <span className="block text-zinc-100">Ship.</span>
             </h1>
 
-            <p className="mx-auto mt-7 max-w-2xl text-base leading-7 text-zinc-400 sm:text-lg">
+            <p className="mx-auto mt-8 max-w-2xl text-base leading-7 text-zinc-400 sm:text-lg">
               Manage projects, tasks, teams, and progress from one focused
               workspace built for modern teams.
             </p>
