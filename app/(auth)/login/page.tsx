@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import { useRouter } from "next/navigation";
 import { GoogleLogin } from "@react-oauth/google";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 import { setToken } from "@/lib/auth/client";
 
 const LOGIN_MUTATION = gql`
@@ -70,7 +72,7 @@ export default function LoginPage() {
   const [googleLogin, { loading: googleLoading }] =
     useMutation<GoogleLoginResponse>(GOOGLE_LOGIN_MUTATION);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     setError("");
@@ -89,8 +91,8 @@ export default function LoginPage() {
       setToken(token);
 
       router.push("/dashboard");
-    } catch (err: any) {
-      setError(err.message || "Login failed");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Login failed");
     }
   }
 
@@ -119,73 +121,132 @@ export default function LoginPage() {
       setToken(token);
 
       router.push("/dashboard");
-    } catch (err: any) {
-      setError(err.message || "Google login failed");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Google login failed");
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-md space-y-4 rounded-xl border p-6"
-      >
-        <h1 className="text-2xl font-bold">Login to TaskFlow</h1>
+    <main className="min-h-screen bg-[#08090b] px-4 py-10 text-zinc-100">
+      <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-md items-center justify-center">
+        <div className="w-full border border-zinc-800 bg-zinc-950 p-6 shadow-[0_30px_100px_rgba(0,0,0,0.65)] sm:p-8">
+          <div className="mb-7">
+            <Link
+              href="/"
+              className="text-lg font-semibold tracking-tight text-white"
+            >
+              TaskFlow
+            </Link>
 
-        {error && <p className="text-sm text-red-500">{error}</p>}
+            <p className="mt-7 text-xs uppercase tracking-[0.2em] text-zinc-600">
+              Welcome back
+            </p>
 
-        <input
-          className="w-full rounded border p-2"
-          placeholder="Email"
-          type="email"
-          value={form.email}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              email: e.target.value,
-            })
-          }
-        />
+            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white">
+              Sign in to TaskFlow
+            </h1>
 
-        <input
-          className="w-full rounded border p-2"
-          placeholder="Password"
-          type="password"
-          value={form.password}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              password: e.target.value,
-            })
-          }
-        />
+            <p className="mt-2 text-sm leading-6 text-zinc-500">
+              Continue managing your projects, tasks, and team workspace.
+            </p>
+          </div>
 
-        <button
-          disabled={loading}
-          className="w-full rounded bg-black p-2 text-white"
-        >
-          {loading ? "Logging in..." : "Login"}
-        </button>
+          {error && (
+            <div className="mb-5 border border-red-900 bg-red-950/30 p-3 text-sm text-red-400">
+              {error}
+            </div>
+          )}
 
-        <div className="flex items-center gap-3">
-          <div className="h-px flex-1 bg-gray-300" />
-          <span className="text-sm text-gray-500">OR</span>
-          <div className="h-px flex-1 bg-gray-300" />
+          <div className="flex justify-center border border-zinc-800 bg-zinc-900/60 p-3">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError("Google login failed")}
+            />
+          </div>
+
+          {googleLoading && (
+            <p className="mt-3 text-center text-xs text-zinc-600">
+              Signing in with Google...
+            </p>
+          )}
+
+          <div className="my-6 flex items-center gap-3">
+            <div className="h-px flex-1 bg-zinc-800" />
+
+            <span className="text-xs uppercase tracking-wider text-zinc-600">
+              Or
+            </span>
+
+            <div className="h-px flex-1 bg-zinc-800" />
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label
+                htmlFor="login-email"
+                className="text-sm font-medium text-zinc-300"
+              >
+                Email
+              </label>
+
+              <input
+                id="login-email"
+                type="email"
+                value={form.email}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    email: e.target.value,
+                  })
+                }
+                className="mt-2 w-full border border-zinc-700 bg-zinc-900 px-3 py-2.5 text-sm text-zinc-200 outline-none transition focus:border-zinc-500"
+                required
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="login-password"
+                className="text-sm font-medium text-zinc-300"
+              >
+                Password
+              </label>
+
+              <input
+                id="login-password"
+                type="password"
+                value={form.password}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    password: e.target.value,
+                  })
+                }
+                className="mt-2 w-full border border-zinc-700 bg-zinc-900 px-3 py-2.5 text-sm text-zinc-200 outline-none transition focus:border-zinc-500"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading || !form.email || !form.password}
+              className="w-full border border-zinc-600 bg-zinc-800 py-2.5 text-sm font-medium text-zinc-100 transition hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {loading ? "Signing in..." : "Sign In"}
+            </button>
+          </form>
+
+          <div className="mt-6 border-t border-zinc-800 pt-5 text-center text-sm text-zinc-500">
+            Don't have an account?{" "}
+            <Link
+              href="/register"
+              className="font-medium text-zinc-200 hover:text-white"
+            >
+              Create a TaskFlow account
+            </Link>
+          </div>
         </div>
-
-        <div className="flex justify-center">
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={() => setError("Google login failed")}
-          />
-        </div>
-
-        {googleLoading && (
-          <p className="text-center text-sm text-gray-500">
-            Signing in with Google...
-          </p>
-        )}
-      </form>
-    </div>
+      </div>
+    </main>
   );
 }
