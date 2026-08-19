@@ -3,7 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+
 import ShapeGrid from "@/components/ShapeGrid";
+import TaskFlowLogo from "@/components/brand/TaskFlowLogo";
 
 export default function Home() {
   return (
@@ -28,12 +30,12 @@ export default function Home() {
       <div className="pointer-events-none relative z-10">
         {/* Navbar */}
         <header className="mx-auto flex max-w-7xl items-center justify-between px-5 py-6 md:px-8">
-          <Link
+          <TaskFlowLogo
             href="/"
-            className="pointer-events-auto text-xl font-semibold tracking-tight text-white"
-          >
-            TaskFlow
-          </Link>
+            variant="wordmark"
+            priority
+            className="pointer-events-auto h-8 w-auto"
+          />
 
           <div className="pointer-events-auto flex items-center gap-2">
             <Link

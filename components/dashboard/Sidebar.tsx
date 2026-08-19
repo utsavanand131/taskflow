@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 
+import TaskFlowLogo from "@/components/brand/TaskFlowLogo";
+
 const menuItems = [
   {
     name: "Dashboard",
@@ -59,7 +61,11 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
       {/* Desktop Sidebar */}
       <aside className="hidden min-h-screen w-64 border-r border-zinc-800 bg-zinc-950 text-zinc-100 md:block">
         <div className="flex h-16 items-center border-b border-zinc-800 px-6">
-          <h1 className="text-xl font-semibold tracking-tight">TaskFlow</h1>
+          <TaskFlowLogo
+            href="/dashboard"
+            variant="wordmark"
+            className="h-8 w-auto"
+          />
         </div>
 
         <nav className="space-y-1 p-4">
@@ -98,7 +104,11 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
           {/* Drawer */}
           <aside className="fixed left-0 top-0 z-50 h-full w-72 border-r border-zinc-800 bg-zinc-950 text-zinc-100 md:hidden">
             <div className="flex h-16 items-center justify-between border-b border-zinc-800 px-5">
-              <h1 className="text-xl font-semibold tracking-tight">TaskFlow</h1>
+              <TaskFlowLogo
+                href="/dashboard"
+                variant="wordmark"
+                className="h-8 w-auto"
+              />
 
               <button
                 type="button"

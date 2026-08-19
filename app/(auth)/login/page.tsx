@@ -7,6 +7,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import TaskFlowLogo from "@/components/brand/TaskFlowLogo";
 import { setToken } from "@/lib/auth/client";
 
 const LOGIN_MUTATION = gql`
@@ -131,12 +132,12 @@ export default function LoginPage() {
       <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-md items-center justify-center">
         <div className="w-full border border-zinc-800 bg-zinc-950 p-6 shadow-[0_30px_100px_rgba(0,0,0,0.65)] sm:p-8">
           <div className="mb-7">
-            <Link
+            <TaskFlowLogo
               href="/"
-              className="text-lg font-semibold tracking-tight text-white"
-            >
-              TaskFlow
-            </Link>
+              variant="wordmark"
+              priority
+              className="h-8 w-auto"
+            />
 
             <p className="mt-7 text-xs uppercase tracking-[0.2em] text-zinc-600">
               Welcome back

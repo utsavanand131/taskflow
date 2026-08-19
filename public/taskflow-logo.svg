@@ -1,0 +1,23 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="tf" x1="96" y1="96" x2="416" y2="416" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F4F4F5"/>
+      <stop offset="1" stop-color="#A1A1AA"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer geometric frame -->
+  <rect x="56" y="56" width="400" height="400" rx="44" fill="#09090B" stroke="#27272A" stroke-width="8"/>
+
+  <!-- T -->
+  <path d="M128 138H384V190H286V374H226V190H128V138Z" fill="url(#tf)"/>
+
+  <!-- F / flow split -->
+  <path d="M272 226H384V274H272V226Z" fill="#D4D4D8"/>
+  <path d="M272 294H360V342H272V294Z" fill="#A1A1AA"/>
+
+  <!-- Motion bars -->
+  <rect x="106" y="390" width="112" height="10" rx="5" fill="#52525B"/>
+  <rect x="250" y="390" width="86" height="10" rx="5" fill="#3F3F46"/>
+  <rect x="352" y="390" width="54" height="10" rx="5" fill="#27272A"/>
+</svg>
