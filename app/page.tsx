@@ -6,6 +6,8 @@ import { ArrowRight } from "lucide-react";
 
 import ShapeGrid from "@/components/ShapeGrid";
 import TaskFlowLogo from "@/components/brand/TaskFlowLogo";
+import FeatureSection from "@/components/landing/FeatureSection";
+import TaskFeatureShowcase from "@/components/landing/TaskFeatureShowcase";
 
 export default function Home() {
   return (
@@ -113,10 +115,8 @@ export default function Home() {
         {/* Dashboard Preview */}
         <section id="product" className="mx-auto max-w-7xl px-5 pb-28 md:px-8">
           <div className="relative">
-            {/* Large soft shadow */}
             <div className="pointer-events-none absolute -inset-10 -z-10 bg-black/80 blur-3xl" />
 
-            {/* Product frame */}
             <div className="overflow-hidden border border-zinc-800 bg-zinc-950 shadow-[0_50px_140px_rgba(0,0,0,0.8)]">
               {/* Browser bar */}
               <div className="flex h-11 items-center border-b border-zinc-800 bg-zinc-950 px-4">
@@ -147,20 +147,91 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Intro to features */}
-        <section className="mx-auto max-w-4xl px-5 pb-28 text-center md:px-8">
-          <p className="text-xs uppercase tracking-[0.2em] text-zinc-600">
-            Everything in one workspace
-          </p>
+        {/* Features */}
+        <section id="features" className="relative">
+          <div className="mx-auto max-w-4xl px-5 pt-10 text-center md:px-8">
+            <p className="text-xs uppercase tracking-[0.2em] text-zinc-600">
+              Built for the way teams work
+            </p>
 
-          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-            Built around the way your team actually works.
-          </h2>
+            <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+              Everything your team needs in one workspace.
+            </h2>
 
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-zinc-500 sm:text-base">
-            Projects, tasks, collaboration, analytics, and realtime activity —
-            connected in one focused workspace.
-          </p>
+            <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-zinc-500 sm:text-base">
+              TaskFlow brings projects, tasks, collaboration, analytics, and
+              activity together without getting in your way.
+            </p>
+          </div>
+
+          {/* Feature divider */}
+          <div className="mx-auto mt-10 flex max-w-7xl items-center gap-4 px-5 md:mt-14 md:px-8">
+            <div className="h-px flex-1 bg-zinc-800" />
+
+            <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-zinc-500">
+              Features
+            </span>
+
+            <div className="h-px flex-1 bg-zinc-800" />
+          </div>
+
+          {/* Project Management */}
+          <FeatureSection
+            eyebrow="Project management"
+            title="Keep every project organized and easy to navigate."
+            description="Create focused project workspaces, connect them to teams, track their status, and keep the work that matters in one place."
+            image="/features/projects.png"
+            imageAlt="TaskFlow projects page"
+          />
+
+          {/* Tasks & Kanban */}
+          <FeatureSection
+            eyebrow="Tasks & Kanban"
+            title="Move work forward without losing visibility."
+            description="Create tasks, set priorities, assign teammates, and move work through your workflow with a focused Kanban board."
+            image="/features/tasks-kanban.png"
+            imageAlt="TaskFlow Kanban board"
+            reverse
+          />
+
+          {/* Task Details Showcase */}
+          <TaskFeatureShowcase
+            items={[
+              {
+                eyebrow: "Task overview",
+                title: "See the complete task at a glance.",
+                description:
+                  "Keep the project, assignee, status, priority, due date, description, and core task information visible in one focused workspace.",
+                image: "/features/task-details-overview.png",
+                imageAlt: "TaskFlow task details overview",
+              },
+              {
+                eyebrow: "Labels & checklist",
+                title: "Break work into manageable pieces.",
+                description:
+                  "Use labels to organize tasks and checklists to turn larger pieces of work into clear, trackable steps.",
+                image: "/features/task-details-management.png",
+                imageAlt: "TaskFlow task labels and checklist",
+              },
+              {
+                eyebrow: "Attachments, comments & activity",
+                title: "Keep the context with the task.",
+                description:
+                  "Share files, discuss the work, and follow a complete activity history without moving the conversation somewhere else.",
+                image: "/features/task-details-collaboration.png",
+                imageAlt: "TaskFlow task attachments comments and activity",
+              },
+            ]}
+          />
+
+          {/* Task Filtering */}
+          <FeatureSection
+            eyebrow="Task discovery"
+            title="Find the work that needs your attention."
+            description="Filter and sort workspace tasks by status, priority, dates, and title so teams can quickly focus on what matters."
+            image="/features/tasks-filtering.png"
+            imageAlt="TaskFlow task filtering and sorting"
+          />
         </section>
       </div>
     </main>
