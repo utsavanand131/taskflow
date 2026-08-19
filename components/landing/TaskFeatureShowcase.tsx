@@ -18,7 +18,7 @@ export default function TaskFeatureShowcase({
   items,
 }: TaskFeatureShowcaseProps) {
   return (
-    <section className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-28">
+    <section className="mx-auto max-w-7xl px-5 py-12 md:px-8 md:py-20">
       <div className="mx-auto max-w-3xl text-center">
         <p className="text-xs font-medium uppercase tracking-[0.22em] text-zinc-500">
           Tasks & task details
@@ -34,7 +34,7 @@ export default function TaskFeatureShowcase({
         </p>
       </div>
 
-      <div className="mt-14 space-y-16 md:mt-20 md:space-y-24">
+      <div className="mt-10 space-y-10 md:mt-14 md:space-y-16">
         {items.map((item, index) => {
           const reverse = index % 2 === 1;
 

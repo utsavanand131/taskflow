@@ -232,6 +232,14 @@ export default function Home() {
             image="/features/tasks-filtering.png"
             imageAlt="TaskFlow task filtering and sorting"
           />
+          <FeatureSection
+            eyebrow="Team collaboration"
+            title="Bring the whole team into the work."
+            description="Invite teammates, manage roles, connect projects to teams, and assign work to the people responsible for getting it done."
+            image="/features/team-collaboration.png"
+            imageAlt="TaskFlow team collaboration"
+            reverse
+          />
         </section>
       </div>
     </main>
