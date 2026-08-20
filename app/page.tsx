@@ -15,7 +15,6 @@ import Footer from "@/components/landing/Footer";
 export default function Home() {
   return (
     <main className="relative min-h-screen scroll-smooth overflow-hidden bg-[#08090b] text-zinc-100">
-      {/* ShapeGrid background */}
       <div className="absolute inset-0">
         <ShapeGrid
           speed={0.35}
@@ -28,12 +27,9 @@ export default function Home() {
         />
       </div>
 
-      {/* Dark overlay - does not block ShapeGrid interaction */}
       <div className="pointer-events-none absolute inset-0 bg-black/30" />
 
-      {/* Main content */}
       <div className="pointer-events-none relative z-10">
-        {/* Navbar */}
         <header className="mx-auto flex max-w-7xl items-center justify-between px-5 py-6 md:px-8">
           <TaskFlowLogo
             href="/"
@@ -59,23 +55,21 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Hero */}
         <section className="mx-auto flex min-h-[calc(100vh-88px)] max-w-6xl items-center justify-center px-5 py-20 text-center md:px-8">
           <div className="relative max-w-4xl">
-            {/* Ambient glow behind hero */}
             <div className="pointer-events-none absolute left-1/2 top-[44%] -z-10 h-[360px] w-[620px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/[0.055] blur-[120px]" />
 
-            {/* Eyebrow glow */}
-            <div className="relative inline-flex">
-              <div className="pointer-events-none absolute -inset-4 rounded-full bg-blue-400/[0.08] blur-2xl" />
+            <div className="relative inline-flex overflow-hidden border border-zinc-700/80 bg-black/55 px-4 py-2 backdrop-blur-sm">
+              <div className="pointer-events-none absolute -inset-4 bg-white/[0.04] blur-2xl" />
 
-              <div className="relative border border-zinc-700/80 bg-black/55 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.22em] text-zinc-300 backdrop-blur-sm sm:text-xs">
-                <span className="mr-2 text-blue-300">✦</span>
+              <div className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 animate-[badgeShine_4s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent blur-[1px]" />
+
+              <div className="relative flex items-center text-[11px] font-medium uppercase tracking-[0.22em] text-zinc-300 sm:text-xs">
+                <span className="mr-2 text-zinc-300">✦</span>
                 Project management for modern teams
               </div>
             </div>
 
-            {/* Hero heading */}
             <h1 className="mt-8 font-serif text-6xl font-medium leading-[0.92] tracking-[-0.045em] text-zinc-100 sm:text-7xl md:text-8xl lg:text-[7.2rem]">
               <span className="block">Plan.</span>
 
@@ -115,13 +109,11 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Dashboard Preview */}
         <section id="product" className="mx-auto max-w-7xl px-5 pb-28 md:px-8">
           <div className="relative">
             <div className="pointer-events-none absolute -inset-10 -z-10 bg-black/80 blur-3xl" />
 
             <div className="overflow-hidden border border-zinc-800 bg-zinc-950 shadow-[0_50px_140px_rgba(0,0,0,0.8)]">
-              {/* Browser bar */}
               <div className="flex h-11 items-center border-b border-zinc-800 bg-zinc-950 px-4">
                 <div className="flex gap-1.5">
                   <span className="h-2.5 w-2.5 bg-zinc-700" />
@@ -150,7 +142,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Features */}
         <section id="features" className="relative">
           <div className="mx-auto max-w-4xl px-5 pt-10 text-center md:px-8">
             <p className="text-xs uppercase tracking-[0.2em] text-zinc-600">
@@ -167,7 +158,6 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Feature divider */}
           <div className="mx-auto mt-10 flex max-w-7xl items-center gap-4 px-5 md:mt-14 md:px-8">
             <div className="h-px flex-1 bg-zinc-800" />
 
@@ -178,7 +168,6 @@ export default function Home() {
             <div className="h-px flex-1 bg-zinc-800" />
           </div>
 
-          {/* Project Management */}
           <FeatureSection
             eyebrow="Project management"
             title="Keep every project organized and easy to navigate."
@@ -187,7 +176,6 @@ export default function Home() {
             imageAlt="TaskFlow projects page"
           />
 
-          {/* Tasks & Kanban */}
           <FeatureSection
             eyebrow="Tasks & Kanban"
             title="Move work forward without losing visibility."
@@ -197,7 +185,6 @@ export default function Home() {
             reverse
           />
 
-          {/* Task Details Showcase */}
           <TaskFeatureShowcase
             items={[
               {
@@ -227,7 +214,6 @@ export default function Home() {
             ]}
           />
 
-          {/* Task Filtering */}
           <FeatureSection
             eyebrow="Task discovery"
             title="Find the work that needs your attention."
@@ -235,6 +221,7 @@ export default function Home() {
             image="/features/tasks-filtering.png"
             imageAlt="TaskFlow task filtering and sorting"
           />
+
           <FeatureSection
             eyebrow="Team collaboration"
             title="Bring the whole team into the work."
@@ -243,12 +230,41 @@ export default function Home() {
             imageAlt="TaskFlow team collaboration"
             reverse
           />
-          {/* Realtime Notifications */}
+
           <RealtimeNotifications />
+
           <FinalCTA />
+
           <Footer />
         </section>
       </div>
+
+      <style jsx>{`
+        @keyframes badgeShine {
+          0% {
+            transform: translateX(-120%);
+            opacity: 0;
+          }
+
+          15% {
+            opacity: 1;
+          }
+
+          50% {
+            transform: translateX(320%);
+            opacity: 1;
+          }
+
+          70% {
+            opacity: 0;
+          }
+
+          100% {
+            transform: translateX(320%);
+            opacity: 0;
+          }
+        }
+      `}</style>
     </main>
   );
 }
