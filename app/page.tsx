@@ -9,10 +9,12 @@ import TaskFlowLogo from "@/components/brand/TaskFlowLogo";
 import FeatureSection from "@/components/landing/FeatureSection";
 import TaskFeatureShowcase from "@/components/landing/TaskFeatureShowcase";
 import RealtimeNotifications from "@/components/landing/RealtimeNotifications";
+import FinalCTA from "@/components/landing/FinalCTA";
+import Footer from "@/components/landing/Footer";
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#08090b] text-zinc-100">
+    <main className="relative min-h-screen scroll-smooth overflow-hidden bg-[#08090b] text-zinc-100">
       {/* ShapeGrid background */}
       <div className="absolute inset-0">
         <ShapeGrid
@@ -243,6 +245,8 @@ export default function Home() {
           />
           {/* Realtime Notifications */}
           <RealtimeNotifications />
+          <FinalCTA />
+          <Footer />
         </section>
       </div>
     </main>
