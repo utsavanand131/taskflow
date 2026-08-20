@@ -8,6 +8,7 @@ import ShapeGrid from "@/components/ShapeGrid";
 import TaskFlowLogo from "@/components/brand/TaskFlowLogo";
 import FeatureSection from "@/components/landing/FeatureSection";
 import TaskFeatureShowcase from "@/components/landing/TaskFeatureShowcase";
+import RealtimeNotifications from "@/components/landing/RealtimeNotifications";
 
 export default function Home() {
   return (
@@ -240,6 +241,8 @@ export default function Home() {
             imageAlt="TaskFlow team collaboration"
             reverse
           />
+          {/* Realtime Notifications */}
+          <RealtimeNotifications />
         </section>
       </div>
     </main>
