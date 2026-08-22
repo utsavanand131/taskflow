@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE `attachment` ADD COLUMN `resourceType` VARCHAR(191) NULL;
+ALTER TABLE `Attachment` ADD COLUMN `resourceType` VARCHAR(191) NULL;

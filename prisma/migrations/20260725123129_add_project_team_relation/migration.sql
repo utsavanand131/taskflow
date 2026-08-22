@@ -1,5 +1,5 @@
 -- AlterTable
-ALTER TABLE `project` ADD COLUMN `teamId` VARCHAR(191) NULL;
+ALTER TABLE `Project` ADD COLUMN `teamId` VARCHAR(191) NULL;
 
 -- CreateIndex
 CREATE INDEX `Project_teamId_idx` ON `Project`(`teamId`);

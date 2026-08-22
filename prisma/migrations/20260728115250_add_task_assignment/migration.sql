@@ -1,5 +1,5 @@
 -- AlterTable
-ALTER TABLE `task` ADD COLUMN `assigneeId` VARCHAR(191) NULL;
+ALTER TABLE `Task` ADD COLUMN `assigneeId` VARCHAR(191) NULL;
 
 -- CreateIndex
 CREATE INDEX `Task_assigneeId_idx` ON `Task`(`assigneeId`);
