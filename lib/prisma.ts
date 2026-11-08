@@ -7,6 +7,10 @@ const globalForPrisma = globalThis as {
   prisma?: PrismaClient;
 };
 
+const caCertificate = process.env.DATABASE_CA_CERT_BASE64
+  ? Buffer.from(process.env.DATABASE_CA_CERT_BASE64, "base64").toString("utf8")
+  : undefined;
+
 const adapter = new PrismaMariaDb({
   host: process.env.DATABASE_HOST!,
   port: Number(process.env.DATABASE_PORT),
@@ -14,6 +18,15 @@ const adapter = new PrismaMariaDb({
   password: process.env.DATABASE_PASSWORD!,
   database: process.env.DATABASE_NAME!,
   connectionLimit: 5,
+
+  ...(caCertificate
+    ? {
+        ssl: {
+          ca: caCertificate,
+          rejectUnauthorized: true,
+        },
+      }
+    : {}),
 });
 
 export const prisma =
