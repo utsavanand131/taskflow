@@ -2,7 +2,43 @@
 
 TaskFlow is a full-stack project management SaaS built for teams to organize projects, manage tasks, collaborate with teammates, and track activity from one focused workspace.
 
-It includes project and task management, Kanban workflows, detailed task management, team collaboration, file attachments, comments, checklists, activity tracking, realtime notifications, and Google OAuth authentication.
+It includes project and task management, Kanban workflows, detailed task management, team collaboration, file attachments, comments, checklists, activity tracking, real-time notifications, and Google OAuth authentication.
+
+## Screenshots
+
+### Dashboard
+
+![TaskFlow Dashboard](screenshots/dashboard.png)
+
+### Projects
+
+![Projects](screenshots/projects.png)
+
+### Tasks
+
+![Task List](screenshots/tasklist.png)
+
+![Tasks](screenshots/tasks.png)
+
+### Team Collaboration
+
+![Team Members](screenshots/teammember.png)
+
+![Invite Member](screenshots/invite.png)
+
+![Team Invitations](screenshots/inviteteams.png)
+
+### Notifications
+
+![Notifications](screenshots/notific.png)
+
+### Recent Activity
+
+![Recent Activity](screenshots/recentactivity.png)
+
+### Settings
+
+![Settings](screenshots/settings.png)
 
 ## Key Features
 
@@ -18,7 +54,7 @@ It includes project and task management, Kanban workflows, detailed task managem
 - Task search, filtering, and sorting
 - Team creation and member management
 - Team invitations and role-based access
-- Realtime notifications
+- Real-time notifications
 - Project progress tracking and dashboard analytics
 - Email/password authentication
 - Google OAuth authentication
@@ -50,7 +86,6 @@ It includes project and task management, Kanban workflows, detailed task managem
 
 ### Services
 
-- Aiven MySQL
 - Cloudinary
 - Google OAuth
 - Vercel
@@ -64,6 +99,7 @@ It includes project and task management, Kanban workflows, detailed task managem
 
 TaskFlow uses a full-stack Next.js architecture with GraphQL as the application API layer.
 
+```text
                     ┌──────────────────────┐
                     │      Next.js App     │
                     │   React + Tailwind   │
@@ -77,7 +113,7 @@ TaskFlow uses a full-stack Next.js architecture with GraphQL as the application 
                                │
                                ▼
                     ┌──────────────────────┐
-                    │   GraphQL Yoga       │
+                    │    GraphQL Yoga      │
                     │      Resolvers       │
                     └──────────┬───────────┘
                                │
@@ -89,11 +125,11 @@ TaskFlow uses a full-stack Next.js architecture with GraphQL as the application 
                                │
                                ▼
                     ┌──────────────────────┐
-                    │     MySQL / Aiven    │
+                    │        MySQL         │
                     └──────────────────────┘
 
         ┌─────────────────┐       ┌─────────────────┐
-        │    Cloudinary   │       │ Google OAuth    │
+        │    Cloudinary   │       │   Google OAuth  │
         │ File Attachments│       │ Authentication  │
         └─────────────────┘       └─────────────────┘
 
@@ -101,6 +137,7 @@ TaskFlow uses a full-stack Next.js architecture with GraphQL as the application 
                     │    Socket.IO    │
                     │ Realtime Events │
                     └─────────────────┘
+```
 
 ## Authentication
 
@@ -148,125 +185,170 @@ The Prisma schema contains the main application entities:
 
 Prisma is configured through `prisma.config.ts`, with migrations stored in:
 
+```text
 prisma/migrations
-For local development, TaskFlow uses a local MySQL database.
+```
 
-Production uses a managed MySQL database hosted on Aiven.
+For local development, TaskFlow uses a local MySQL database. Production uses a managed MySQL database.
 
-Production database migrations are applied with:
+Production database migrations can be applied with:
 
+```bash
 npx prisma migrate deploy
-Cloudinary Uploads
+```
+
+## Cloudinary Uploads
 
 TaskFlow uses Cloudinary to store task attachments.
 
 The upload flow is:
 
+```text
 Task Details
-↓
+     ↓
 Upload API
-↓
+     ↓
 Cloudinary
-↓
+     ↓
 File URL + Metadata
-↓
+     ↓
 MySQL
+```
 
 Attachment metadata includes:
 
-File name
-File URL
-File size
-MIME type
-Uploading user
-Associated task
+- File name
+- File URL
+- File size
+- MIME type
+- Uploading user
+- Associated task
 
 Cloudinary credentials are stored as environment variables and are not committed to the repository.
 
-Realtime Notifications
+## Real-time Notifications
 
-TaskFlow uses Socket.IO for realtime notifications and application events.
+TaskFlow uses Socket.IO for real-time notifications and application events.
 
 Users can receive updates without manually refreshing the application.
 
-Realtime functionality is used for:
+Real-time functionality is used for:
 
-Task activity
-Team activity
-Notifications
-Collaboration events
-Local Development Setup
+- Task activity
+- Team activity
+- Notifications
+- Collaboration events
 
-1. Clone the repository
-   git clone https://github.com/utsavanand131/taskflow.git
-   cd taskflow
-2. Install dependencies
-   npm install
+## Local Development Setup
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/utsavanand131/taskflow.git
+cd taskflow
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
 
 Prisma Client is generated automatically during installation.
 
 You can also generate it manually:
 
-npx prisma generate 3. Configure environment variables
+```bash
+npx prisma generate
+```
 
-Create a .env file in the project root and add the required environment variables.
+### 3. Configure environment variables
 
-4. Run Prisma migrations
+Create a `.env` file in the project root and add the required environment variables.
+
+### 4. Run Prisma migrations
 
 For a local development database:
 
-npx prisma migrate dev 5. Start the development server
+```bash
+npx prisma migrate dev
+```
+
+### 5. Start the development server
+
+```bash
 npm run dev
+```
 
 Open:
 
-http://localhost:3000 6. Create a production build locally
-npm run build 7. Run the production build
+```text
+http://localhost:3000
+```
+
+### 6. Create a production build locally
+
+```bash
+npm run build
+```
+
+### 7. Run the production build
+
+```bash
 npm start
-Environment Variables
+```
+
+## Environment Variables
 
 TaskFlow uses environment variables for database access, authentication, Google OAuth, and Cloudinary.
 
-Database
+```env
+# Database
 DATABASE_URL=
 DATABASE_HOST=
 DATABASE_PORT=
 DATABASE_USER=
 DATABASE_PASSWORD=
 DATABASE_NAME=
-Authentication
+
+# Authentication
 JWT_SECRET=
-Google OAuth
+
+# Google OAuth
 GOOGLE_CLIENT_ID=
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=
-Cloudinary
+
+# Cloudinary
 CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
+```
 
-Never commit .env files or expose secret values in the repository.
+Never commit `.env` files or expose secret values in the repository.
 
 For production, environment variables are configured through Vercel.
 
-Deployment
+## Deployment
 
 TaskFlow is deployed using Vercel.
 
 The production architecture is:
 
+```text
 GitHub
-↓
+   ↓
 Vercel
-↓
+   ↓
 Next.js / GraphQL
-├── Prisma 7.9.0
-│ ↓
-│ Aiven MySQL
-│
-├── Cloudinary
-│
-├── Google OAuth
-│
-└── Socket.IO
+   ├── Prisma ORM
+   │      ↓
+   │     MySQL
+   │
+   ├── Cloudinary
+   │
+   ├── Google OAuth
+   │
+   └── Socket.IO
+```
 
-The production database is hosted on Aiven MySQL, while task attachments are stored using Cloudinary.
+The production database is hosted using a managed MySQL service, while task attachments are stored using Cloudinary.
